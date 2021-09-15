@@ -122,8 +122,8 @@
             });
 
             $(document).on('click', '#addOrderBtn', function() {
-                $('#create_dispatch_form')[0].reset();
-                $('#add-dispatch-modal').modal('show');
+                $('#create_order_form')[0].reset();
+                $('#add-order-modal').modal('show');
             });
             $(document).on('click', '#editOrderBtn', function() {
                 var id = $(this).data('id');

@@ -7,10 +7,9 @@
                     <a class="navbar-brand" href="index.html">
                         <!-- Logo icon --><b>
                             <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                            <!-- Dark Logo icon -->
-                            <img src="{{ URL::to('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
+                          
                             <!-- Light Logo icon -->
-                            <img src="{{ URL::to('assets/images/logo-light-icon.png') }}" alt="homepage" class="light-logo" />
+                            <img src="{{ URL::to('assets/images/flomuvina_logo.jpeg') }}" style="width:50px;height:50px" alt="homepage" class="light-logo" />
                         </b>
                         <!--End Logo icon -->
                         <span class="hidden-xs"><span class="font-bold">Flomuvina</span>
@@ -35,7 +34,6 @@
                         <!-- ============================================================== -->
                         <li class="nav-item">
                             <form class="app-search d-none d-md-block d-lg-block">
-                                <input type="text" class="form-control" placeholder="Search & enter">
                             </form>
                         </li>
                     </ul>

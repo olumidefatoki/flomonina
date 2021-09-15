@@ -69,7 +69,7 @@
                                             <label class="control-label text-right col-md-6">Accepted Quantity:</label>
                                             <div class="col-md-6">
                                                 <p class="form-control-static">
-                                                    {{ number_format($delivery->accepted_quantity, 2) }} </p>
+                                                    {{ number_format($delivery->accepted_quantity, 2) }} kg</p>
                                             </div>
                                         </div>
                                     </div>
@@ -91,7 +91,7 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Order Price:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static"> {{ $delivery->order_price }} </p>
+                                                <p class="form-control-static">&#8358; {{ $delivery->order_price }} </p>
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +100,7 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Partner Price:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static"> {{ $delivery->partner_price }} </p>
+                                                <p class="form-control-static">&#8358; {{ $delivery->partner_price }} </p>
                                             </div>
                                         </div>
                                     </div>
@@ -111,7 +111,7 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Revenue Price:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static"> {{ $delivery->revenue_price }} </p>
+                                                <p class="form-control-static">&#8358; {{ $delivery->revenue_price }} </p>
                                             </div>
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Partner Amount:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static">
+                                                <p class="form-control-static"> &#8358;
                                                     {{ number_format($delivery->partner_price * $delivery->accepted_quantity) }}
                                                 </p>
                                             </div>
@@ -133,8 +133,8 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Order Amount:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static">
-                                                    {{ number_format($delivery->partner_price * $delivery->accepted_quantity) }}
+                                                <p class="form-control-static"> &#8358;
+                                                    {{ number_format($delivery->order_price * $delivery->accepted_quantity) }}
                                                 </p>
                                             </div>
                                         </div>
@@ -144,8 +144,8 @@
                                         <div class="form-group row">
                                             <label class="control-label text-right col-md-6">Revenue Amount:</label>
                                             <div class="col-md-6">
-                                                <p class="form-control-static">
-                                                    {{ number_format($delivery->partner_price * $delivery->accepted_quantity) }}
+                                                <p class="form-control-static"> &#8358;
+                                                    {{ number_format($delivery->revenue_price * $delivery->accepted_quantity) }}
                                                 </p>
                                             </div>
                                         </div>
@@ -184,8 +184,8 @@
                                     <div class="col-md-12">
                                         <div class="row">
                                             <div class="offset-sm-5 col-sm-9">
-                                                <button type="submit" class="btn btn-success "> <i
-                                                        class="fa fa-pencil"></i> Approve</button>
+                                               <!-- <button type="submit" class="btn btn-success "> <i
+                                                        class="fa fa-pencil"></i> Approve</button> -->
                                             </div>
                                         </div>
                                     </div>

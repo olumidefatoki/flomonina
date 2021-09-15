@@ -45,9 +45,9 @@
                                         <th>Partner</th>
                                         <th>Commodity</th>
                                         <th>Truck No</th>
-                                        <th nowrap>Accepted Quantity</th>
-                                        <th nowrap>Partner Amount</th>
-                                        <th nowrap>Discounted Amount</th>
+                                        <th nowrap>Accepted Quantity(kg)</th>
+                                        <th nowrap>Partner Amount(&#8358;)</th>
+                                        <th nowrap>Discounted Amount(&#8358;)</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>

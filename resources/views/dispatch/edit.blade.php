@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-md-12 m-b-20">
                                 <input type="text" class="form-control" name="dispatch_location"
-                                    placeholder="Dispatch Location of bags">
+                                    placeholder="Dispatch Location">
                                 <span style="font-size: 10px;" class="text-danger error-text dispatch_location_error"></span>
                             </div>
 
