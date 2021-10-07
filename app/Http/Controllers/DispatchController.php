@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dispatch;
+use App\Models\Delivery;
 use App\Models\State;
-use App\Models\BuyerOrder;
-use App\Models\Partner;
+use App\Models\Trade;
+use App\Models\Aggregator;
 use Validator;
 use DataTables;
 use Exception;
@@ -28,26 +29,30 @@ class DispatchController extends Controller
      */
     public function index()
     {
-        $buyerOrders = BuyerOrder::all();
-        $partners = Partner::all();
+        $date = now();
+
+        $trades = Trade::where('end_date', '>', $date)->get();
+        $aggregators = Aggregator::all();
         $states = State::all();
         return view('dispatch.index', [
-            'buyerOrders' => $buyerOrders,
-            'partners' => $partners,
+            'trades' => $trades,
+            'aggregators' => $aggregators,
             'states' => $states,
         ]);
     }
 
     public function getDispatchList(Request $request)
     {
-        $dispatchs = Dispatch::join('buyer_order', 'buyer_order_id', '=', 'buyer_order.id')
-            ->join('partner', 'partner.id', '=', 'dispatch.partner_id')
-            ->join('buyer', 'buyer.id', '=', 'buyer_order.buyer_id')
-            ->join('commodity', 'commodity.id', '=', 'buyer_order.commodity_id')
-            ->orderBy('buyer_order.id', 'desc')
+        $dispatchs = Dispatch::join('trade', 'trade.id', '=', 'dispatch.trade_id')
+            ->join('partner', 'partner.id', '=', 'trade.partner_id')
+            ->join('state', 'state.id', '=', 'dispatch.state_id')
+            ->join('status', 'status.id', '=', 'dispatch.status_id')
+            ->join('aggregator', 'aggregator.id', '=', 'dispatch.aggregator_id')
+            ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
+            ->orderBy('dispatch.id', 'desc')
             ->get([
-                'buyer_order.*', 'dispatch.*', 'partner.name As partner_name',
-                'buyer.name As buyer_name', 'commodity.name As commodity_name'
+                'trade.*', 'dispatch.*', 'partner.name As partner', 'state.name As state', 'status.name As status',
+                'aggregator.name As aggregator', 'commodity.name As commodity'
             ]);
         return DataTables::of($dispatchs)
             ->addIndexColumn()
@@ -80,14 +85,14 @@ class DispatchController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'order' => 'required|numeric',
-            'partner' => 'required|numeric',
+            'trade' => 'required|numeric',
+            'aggregator' => 'required|numeric',
             'number_of_bags' => 'required|numeric',
             'truck_number' => 'required|max:8',
             'driver_name' => 'required|max:255',
             'driver_phone_number' => 'required|digits:11',
             'state' => 'required|numeric',
-            'dispatch_location' => 'required|max:255',
+            'pickup_location' => 'required|max:255',
         ]);
 
         if (!$validator->passes()) {
@@ -95,14 +100,14 @@ class DispatchController extends Controller
         }
 
         $data = array(
-            'buyer_order_id' => $request->order,
-            'partner_id' => $request->partner,
+            'trade_id' => $request->trade,
+            'aggregator_id' => $request->aggregator,
             'number_of_bags' => $request->number_of_bags,
             'truck_number' => $request->truck_number,
             'driver_name' => $request->driver_name,
             'driver_number' => $request->driver_phone_number,
             'state_id' => $request->state,
-            'dispatch_location' => $request->dispatch_location,
+            'pickup_location' => $request->pickup_location,
             'status_id' => 3,
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
@@ -152,14 +157,14 @@ class DispatchController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'order' => 'required|numeric',
-            'partner' => 'required|numeric',
+            'trade' => 'required|numeric',
+            'aggregator' => 'required|numeric',
             'number_of_bags' => 'required|numeric',
             'truck_number' => 'required|max:8',
             'driver_name' => 'required|max:255',
             'driver_phone_number' => 'required|digits:11',
             'state' => 'required|numeric',
-            'dispatch_location' => 'required|max:255',
+            'pickup_location' => 'required|max:255',
         ]);
 
         if (!$validator->passes()) {
@@ -167,14 +172,14 @@ class DispatchController extends Controller
         }
 
         $data = array(
-            'buyer_order_id' => $request->order,
-            'partner_id' => $request->partner,
+            'trade_id' => $request->trade,
+            'aggregator_id' => $request->aggregator,
             'number_of_bags' => $request->number_of_bags,
             'truck_number' => $request->truck_number,
             'driver_name' => $request->driver_name,
             'driver_number' => $request->driver_phone_number,
             'state_id' => $request->state,
-            'dispatch_location' => $request->dispatch_location,
+            'pickup_location' => $request->pickup_location,
             'status_id' => 3,
             'updated_by' => Auth::id(),
         );
@@ -205,11 +210,11 @@ class DispatchController extends Controller
 
     public function getDispatchDetail($id)
     {
-        $dispatchDetails = DB::select('SELECT buyer.name buyer, commodity.name commodity, partner.name partner
-                                FROM dispatch inner join  buyer_order on dispatch.buyer_order_id = buyer_order.id 
-                                inner join buyer on buyer.id = buyer_order.buyer_id 
-                                inner join partner on partner.id =  dispatch.partner_id
-                                inner join commodity  on commodity.id = buyer_order.commodity_id
+        $dispatchDetails = DB::select('SELECT aggregator.name aggregator, commodity.name commodity, partner.name partner
+                                FROM dispatch inner join  trade on dispatch.trade_id = trade.id 
+                                inner join aggregator on aggregator.id = dispatch.aggregator_id 
+                                inner join partner on partner.id =  trade.partner_id
+                                inner join commodity  on commodity.id = trade.commodity_id
                                 WHERE dispatch.id=?', [$id]);
         return json_encode($dispatchDetails[0]);
     }

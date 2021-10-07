@@ -15,9 +15,9 @@ class Delivery extends Model
         return $this->belongsTo('App\Models\Dispatch');
     }
 
-    public function buyerOrder()
+    public function trade()
     {
-        return $this->buyerOrder('App\Models\BuyerOrder');
+        return $this->buyerOrder('App\Models\Trade');
     }
 
     public function status()

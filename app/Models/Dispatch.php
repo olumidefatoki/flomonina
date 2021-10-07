@@ -15,9 +15,9 @@ class Dispatch extends Model
         return $this->hasOne('App\Models\Delivery');
     }
 
-    public function buyerOrder()
+    public function trade()
     {
-        return $this->belongsTo('App\Models\BuyerOrder');
+        return $this->belongsTo('App\Models\Trade');
     }
     public function partner()
     {

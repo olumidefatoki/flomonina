@@ -173,6 +173,7 @@ Flomuvina | Trade
                     name: 'food_processor'
 
                 },
+
                 {
                     data: 'delivery_location',
                     name: 'delivery_location',

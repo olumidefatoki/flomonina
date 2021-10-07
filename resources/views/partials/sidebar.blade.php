@@ -13,12 +13,12 @@
                 </li>
                 <li> <a class="waves-effect waves-dark" href="{{ route('trade.index') }}"><i class="fa fa-shopping-cart"></i><span class="hide-menu">Trade</span></a>
                 </li>
-                <!--        <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="fas fa-truck"></i><span class="hide-menu">Deliveries</span></a>
-                            <ul aria-expanded="false" class="collapse">
-                                <li><a href="{{ route('dispatch.index') }}"><i class="fas fa-truck"></i> Dispatch</a></li>
-                                <li><a href="{{ route('delivery.index') }}"><i class="fas fa-upload"></i> Truck Upload</a></li>
-                            </ul>
-                        </li> -->
+                <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="fas fa-truck"></i><span class="hide-menu">Deliveries</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a href="{{ route('dispatch.index') }}"><i class="fas fa-truck"></i> Dispatch</a></li>
+                        <li><a href="{{ route('delivery.index') }}"><i class="fas fa-upload"></i> Ticket Upload</a></li>
+                    </ul>
+                </li>
 
                 <!-- <li> <a class="waves-effect waves-dark" href="#"><i class="fab fa-amazon-pay"></i><span class="hide-menu">Payment</span></a>
                 </li> -->
