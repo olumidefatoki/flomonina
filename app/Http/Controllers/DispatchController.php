@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 
 class DispatchController extends Controller
 {
-      public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
     }
@@ -31,31 +31,34 @@ class DispatchController extends Controller
         $buyerOrders = BuyerOrder::all();
         $partners = Partner::all();
         $states = State::all();
-        return view('dispatch.index',[
-            'buyerOrders'=>$buyerOrders,
-            'partners'=>$partners,
-            'states'=>$states,
+        return view('dispatch.index', [
+            'buyerOrders' => $buyerOrders,
+            'partners' => $partners,
+            'states' => $states,
         ]);
     }
 
-    public function getDispatchList(Request $request){
-        $dispatchs = Dispatch::join('buyer_order','buyer_order_id' ,'=','buyer_order.id')
-                                    ->join('partner', 'partner.id', '=', 'dispatch.partner_id')
-                                    ->join('buyer', 'buyer.id', '=', 'buyer_order.buyer_id')
-                                    ->join('commodity', 'commodity.id', '=', 'buyer_order.commodity_id')
-                                    ->orderBy('buyer_order.id', 'desc')
-                                    ->get(['buyer_order.*', 'dispatch.*', 'partner.name As partner_name',
-                                            'buyer.name As buyer_name','commodity.name As commodity_name']);
-        return DataTables::of($dispatchs)                                
-                              ->addIndexColumn()
-                              ->addColumn('actions', function($row){
-                                  return '<div class="btn-group">
-                                                <button class="btn btn-sm btn-info" data-id="'.$row['id'].'" id="editDispatchBtn">Edit</button> 
+    public function getDispatchList(Request $request)
+    {
+        $dispatchs = Dispatch::join('buyer_order', 'buyer_order_id', '=', 'buyer_order.id')
+            ->join('partner', 'partner.id', '=', 'dispatch.partner_id')
+            ->join('buyer', 'buyer.id', '=', 'buyer_order.buyer_id')
+            ->join('commodity', 'commodity.id', '=', 'buyer_order.commodity_id')
+            ->orderBy('buyer_order.id', 'desc')
+            ->get([
+                'buyer_order.*', 'dispatch.*', 'partner.name As partner_name',
+                'buyer.name As buyer_name', 'commodity.name As commodity_name'
+            ]);
+        return DataTables::of($dispatchs)
+            ->addIndexColumn()
+            ->addColumn('actions', function ($row) {
+                return '<div class="btn-group">
+                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editDispatchBtn">Edit</button> 
                                           </div>';
-                              })->rawColumns(['actions'])
-                              ->editColumn('number_of_bags', function($item) {
-                                return number_format($item->number_of_bags);
-                            })->make(true);
+            })->rawColumns(['actions'])
+            ->editColumn('number_of_bags', function ($item) {
+                return number_format($item->number_of_bags);
+            })->make(true);
     }
 
     /**
@@ -76,7 +79,7 @@ class DispatchController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'order' => 'required|numeric',
             'partner' => 'required|numeric',
             'number_of_bags' => 'required|numeric',
@@ -87,8 +90,8 @@ class DispatchController extends Controller
             'dispatch_location' => 'required|max:255',
         ]);
 
-        if(!$validator->passes()){
-            return response()->json(['status'=>0, 'error'=>$validator->errors()->toArray()]);
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
         $data = array(
@@ -105,15 +108,14 @@ class DispatchController extends Controller
             'updated_by' => Auth::id(),
         );
         $result = DB::table('dispatch')->insert($data);
-        if( $result ){
-            return response()->json(['status'=>1, 'msg'=>'New Dispatch has been successfully created.']);
+        if ($result) {
+            return response()->json(['status' => 1, 'msg' => 'New Dispatch has been successfully created.']);
         }
     }
     public function getDeliveryDetails($id)
     {
 
-        return view('delivery.view',['delivery'=>Delivery::find($id)]);
-
+        return view('delivery.view', ['delivery' => Delivery::find($id)]);
     }
 
     /**
@@ -136,7 +138,7 @@ class DispatchController extends Controller
     public function edit($id)
     {
         $dispatch = Dispatch::find($id);
-        return response()->json(['details'=>$dispatch]);
+        return response()->json(['details' => $dispatch]);
     }
 
     /**
@@ -148,8 +150,8 @@ class DispatchController extends Controller
      */
     public function update(Request $request, Dispatch $dispatch)
     {
-        
-        $validator = Validator::make($request->all(),[
+
+        $validator = Validator::make($request->all(), [
             'order' => 'required|numeric',
             'partner' => 'required|numeric',
             'number_of_bags' => 'required|numeric',
@@ -160,8 +162,8 @@ class DispatchController extends Controller
             'dispatch_location' => 'required|max:255',
         ]);
 
-        if(!$validator->passes()){
-            return response()->json(['status'=>0, 'error'=>$validator->errors()->toArray()]);
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
         $data = array(
@@ -177,17 +179,16 @@ class DispatchController extends Controller
             'updated_by' => Auth::id(),
         );
 
-        try{
+        try {
 
             DB::enableQueryLog();
             $result = DB::table('dispatch')->where('id', $request->id)->update($data);
             //dd(DB::getQueryLog());
-            
-            return response()->json(['status'=>1, 'msg'=>'dispatch details has been successfully Updated.']);
-        }    
-        catch (Exception $ex) {
+
+            return response()->json(['status' => 1, 'msg' => 'dispatch details has been successfully Updated.']);
+        } catch (Exception $ex) {
             Log::error($ex->getMessage());
-            return response()->json(['status'=>2, 'msg'=>'Something went wrong. Kindly contact the Admin.']);
+            return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
         }
     }
 

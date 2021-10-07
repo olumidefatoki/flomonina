@@ -1,14 +1,14 @@
 <tr>
-    <div id="add-partner-modal" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div id="add-aggregator-modal" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel">Add New
-                        partner</h4>
+                        Aggregator</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" method="post" action="{{ route('partner.store') }}" id="create_partner_form">
+                    <form class="form-horizontal" method="post" action="{{ route('aggregator.store') }}" id="create_aggregator_form">
                         @csrf
                         <div class="form-group">
                             <div class="col-md-12 m-b-20 @error('name') has-error has-feedback @enderror">
@@ -16,25 +16,12 @@
                                 <span style="font-size: 10px;" class="text-danger modal-body-error error-text name_error"></span>
                             </div>
                             <div class="col-md-12 m-b-20">
-                                <select id="formGender" name="type" class="form-control select">
-                                    <option selected disabled>Select</option>
-                                    <option value="financier">Financier</option>
-                                    <option value="processor">Processor</option>
-
-                                </select>
-                                <span style="font-size: 10px;" class="text-danger error-text state_error "></span>
-                            </div>
-                            <div class="col-md-12 m-b-20">
                                 <input type="text" class="form-control" name="address" placeholder="Address">
                                 <span style="font-size: 10px;" class="text-danger error-text address_error"></span>
                             </div>
                             <div class="col-md-12 m-b-20">
-                                <input type="text" class="form-control" name="contact_person_first_name" placeholder="Contact Person  First Name">
-                                <span style="font-size: 10px;" class="text-danger error-text contact_person_first_name_error"></span>
-                            </div>
-
-                            <div class="col-md-12 m-b-20">
-                                <input type="text" class="form-control" name="contact_person_last_name" placeholder="Contact Person Last Name">
+                                <input type="text" class="form-control" name="contact_person_name" placeholder="Contact Person  Name">
+                                <span style="font-size: 10px;" class="text-danger error-text contact_person_name_error"></span>
                             </div>
                             <div class="col-md-12 m-b-20">
                                 <input type="text" class="form-control" name="contact_person_email" placeholder="Contact Person Email">
@@ -56,6 +43,25 @@
                                     @endforeach
                                 </select>
                                 <span style="font-size: 10px;" class="text-danger error-text state_error "></span>
+                            </div>
+                            <div class="col-md-12 m-b-20">
+                                <select id="formGender" name="bank" class="form-control select">
+                                    <option selected disabled>Select a Bank</option>
+                                    @foreach ($banks as $bank)
+                                    <option value="{{ $bank->id }}">
+                                        {{ $bank->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <span style="font-size: 10px;" class="text-danger error-text bank_error "></span>
+                            </div>
+                            <div class="col-md-12 m-b-20">
+                                <input type="text" class="form-control" name="account_name" placeholder="Account Name">
+                                <span style="font-size: 10px;" class="text-danger error-text account_name_error"></span>
+                            </div>
+                            <div class="col-md-12 m-b-20">
+                                <input type="text" class="form-control" name="account_number" placeholder="Account Number">
+                                <span style="font-size: 10px;" class="text-danger error-text account_number_error"></span>
                             </div>
                         </div>
                         <div class="modal-footer">

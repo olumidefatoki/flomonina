@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-Flomuvina | Partner
+Flomuvina | Aggregator
 @endsection
 @section('content')
 <div class="container-fluid">
@@ -9,15 +9,15 @@ Flomuvina | Partner
     <!-- ============================================================== -->
     <div class="row page-titles">
         <div class="col-md-5 align-self-center">
-            <h4 class="text-themecolor">partners</h4>
+            <h4 class="text-themecolor">Aggregators</h4>
         </div>
         <div class="col-md-7 align-self-center text-right">
             <div class="d-flex justify-content-end align-items-center">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                    <li class="breadcrumb-item active">partners</li>
+                    <li class="breadcrumb-item active">Aggregators</li>
                 </ol>
-                <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" id="addpartnerBtn">
+                <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" id="addAggregatorBtn">
                     <i class="fa fa-plus-circle"></i> Create New</button>
             </div>
         </div>
@@ -33,25 +33,26 @@ Flomuvina | Partner
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="partners-table" class="table m-t-30 table-hover no-wrap contact-list" data-paging="true" data-paging-size="7">
+                        <table id="aggregators-table" class="table m-t-30 table-hover no-wrap contact-list" data-paging="true" data-paging-size="7">
                             <thead>
                                 <tr>
                                     <th>S/N</th>
                                     <th>Name</th>
-                                    <th>Type</th>
                                     <th>Address</th>
                                     <th>Contact Person</th>
                                     <th>Contact Email</th>
-                                    <th>Contact Phone Number</th>
+                                    <th no-wrap>Contact Phone Number</th>
                                     <th>State Name</th>
+                                    <th>Bank Name</th>
+                                    <th>Account Name</th>
+                                    <th>Account Number</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
-                            @include('partner.add')
-                            @include('partner.edit')
+                            <tbody></tbody>
                             <tfoot>
+                                @include('aggregator.add')
+                                @include('aggregator.edit')
                             </tfoot>
                         </table>
                     </div>
@@ -68,7 +69,7 @@ Flomuvina | Partner
 @section('script')
 <script>
     $(function() {
-        $("#create_partner_form").on('submit', function(e) {
+        $("#create_aggregator_form").on('submit', function(e) {
             e.preventDefault();
             $.ajax({
                 url: $(this).attr('action'),
@@ -87,19 +88,19 @@ Flomuvina | Partner
                             $('span.' + prefix + '_error').text(val[0]);
                         });
                     } else {
-                        $('#partners-table').DataTable().ajax.reload(null, false);
-                        $('#create_partner_form')[0].reset();
-                        $('#add-partner-modal').modal('hide');
+                        $('#aggregators-table').DataTable().ajax.reload(null, false);
+                        $('#create_aggregator_form')[0].reset();
+                        $('#add-aggregator-modal').modal('hide');
                     }
                 }
             });
         });
 
-        var table = $('#partners-table').DataTable({
+        var table = $('#aggregators-table').DataTable({
             processing: true,
             serverSide: true,
             info: true,
-            ajax: "{{ route('partner.list') }}",
+            ajax: "{{ route('aggregator.list') }}",
             "pageLength": 50,
             "aLengthMenu": [
                 [25, 50, -1],
@@ -114,12 +115,6 @@ Flomuvina | Partner
                 {
                     data: 'name',
                     name: 'name'
-                },
-                {
-                    data: 'type',
-                    name: 'type',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'address',
@@ -145,10 +140,27 @@ Flomuvina | Partner
                     orderable: false,
                     searchable: false
                 },
-
                 {
                     data: 'state_name',
                     name: 'state_name',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'bank_name',
+                    name: 'bank_name',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'account_name',
+                    name: 'account_name',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'account_number',
+                    name: 'account_number',
                     orderable: false,
                     searchable: false
                 },
@@ -161,36 +173,38 @@ Flomuvina | Partner
             ]
         });
 
-        $(document).on('click', '#addpartnerBtn', function() {
-            $('#create_partner_form')[0].reset();
-            $('#add-partner-modal').modal('show');
+        $(document).on('click', '#addAggregatorBtn', function() {
+            $('#create_aggregator_form')[0].reset();
+            $('#add-aggregator-modal').modal('show');
         });
 
-        $(document).on('click', '#editPartnerBtn', function() {
+        $(document).on('click', '#editAggregatorBtn', function() {
             var id = $(this).data('id');
-            $('#update_partner_form')[0].reset();
+            $('#update_aggregator_form')[0].reset();
             $(document).find('span.error-text').text('');
-            $('#edit-partner-modal').modal('show');
+            $('#edit-aggregator-modal').modal('show');
 
-            $.get("{{ url('/partner/edit/') }}" + '/' + id, function(data) {
-                //alert(data.details.name);
+            $.get("{{ url('/aggregator/edit/') }}" + '/' + id, function(data) {
+                console.log(data.details);
                 $('input[name="id"]').val(data.details.id);
                 $('input[name="name"]').val(data.details.name);
                 $('input[name="address"]').val(data.details.address);
                 $('input[name="contact_person_first_name"]').val(data.details
                     .contact_person_first_name);
-                $('input[name="contact_person_last_name"]').val(data.details
-                    .contact_person_last_name);
+                $('input[name="contact_person_name"]').val(data.details
+                    .contact_person_name);
                 $('input[name="contact_person_email"]').val(data.details.contact_person_email);
                 $('input[name="contact_person_phone_number"]').val(data.details
                     .contact_person_phone_number);
                 $('select[name="state"]').val(data.details.state_id);
-                $('select[name="type"]').val(data.details.type);
+                $('select[name="bank"]').val(data.details.bank_id);
+                $('input[name="account_number"]').val(data.details.account_number);
+                $('input[name="account_name"]').val(data.details.account_name);
 
             }, 'json');
         });
 
-        $("#update_partner_form").on('submit', function(e) {
+        $("#update_aggregator_form").on('submit', function(e) {
             e.preventDefault();
             $.ajax({
                 url: $(this).attr('action'),
@@ -204,15 +218,15 @@ Flomuvina | Partner
                 },
                 success: function(data) {
                     console.log(data);
-                    if (data.status == 1) {
-                        $('#partners-table').DataTable().ajax.reload(null, false);
-                        $('#update_partner_form')[0].reset();
-                        $('#edit-partner-modal').modal('hide');
-                        toastr.success(data.msg);
-                    } else if (data.status == 0) {
+                    if (data.status == 0) {
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
                         });
+                    } else if (data.status == 1) {
+                        $('#aggregators-table').DataTable().ajax.reload(null, false);
+                        $('#update_aggregator_form')[0].reset();
+                        $('#edit-aggregator-modal').modal('hide');
+                        toastr.success(data.msg);
                     } else {
                         $('span.error_message').text(data.msg);
                     }

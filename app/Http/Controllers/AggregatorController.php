@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Validator;
 use DataTables;
 use Exception;
-use App\Models\Partner;
+use App\Models\Aggregator;
 use App\Models\State;
 use App\Models\Bank;
 use Illuminate\Support\Facades\DB;
@@ -13,25 +13,23 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class PartnerController extends Controller
+class AggregatorController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
     }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
     public function index()
     {
         $states = State::all();
         $banks = Bank::all();
         return view(
-            'partner.index',
+            'aggregator.index',
             [
                 'states' => $states,
                 'banks' => $banks
@@ -39,20 +37,23 @@ class PartnerController extends Controller
         );
     }
 
-    public function getPartnerList(Request $request)
+    public function getAggregatorList(Request $request)
     {
-        $partners = Partner::join('state', 'state.id', '=', 'partner.state_id')
-            ->orderBy('partner.id', 'desc')
-            ->get(['partner.*', 'state.name AS state_name']);
-        return DataTables::of($partners)
+        $aggregators = Aggregator::join('state', 'state.id', '=', 'aggregator.state_id')
+            ->join('bank', 'bank.id', '=', 'aggregator.bank_id')
+            ->orderBy('aggregator.id', 'desc')
+            ->get([
+                'aggregator.*', 'state.name AS state_name', 'bank.name As bank_name'
+            ]);
+        return DataTables::of($aggregators)
             ->addIndexColumn()
             ->addColumn('actions', function ($row) {
                 return '<div class="btn-group">
-                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editPartnerBtn">Edit</button> 
+                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editAggregatorBtn">Edit</button> 
                                           </div>';
             })->rawColumns(['actions'])
-            ->editColumn('contact_person_name', function ($item) {
-                return ($item->contact_person_first_name . ", " . $item->contact_person_last_name);
+            ->editColumn('quantity', function ($item) {
+                return number_format($item->quantity);
             })
             ->make(true);
     }
@@ -76,14 +77,15 @@ class PartnerController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255|unique:partner',
+            'name' => 'required|max:255|unique:aggregator',
             'address' => 'required|max:255',
-            'contact_person_first_name' => 'required|max:255',
-            'contact_person_email' => 'required|email|max:255|unique:partner',
-            'contact_person_phone_number' => 'required|digits:11|unique:partner',
+            'contact_person_name' => 'required|max:255',
+            'contact_person_email' => 'required|email|max:255|unique:aggregator',
+            'contact_person_phone_number' => 'required|digits:11|unique:aggregator',
             'state' => 'required|numeric',
-            'type' => 'required'
-
+            'bank' => 'required|numeric',
+            'account_name' => 'required|max:255',
+            'account_number' => 'required|digits:11'
         ]);
 
         if (!$validator->passes()) {
@@ -93,28 +95,29 @@ class PartnerController extends Controller
         $data = array(
             'name' => $request->name,
             'address' => $request->address,
-            'contact_person_first_name' => $request->contact_person_first_name,
-            'contact_person_last_name' => $request->contact_person_last_name,
+            'contact_person_name' => $request->contact_person_name,
             'state_id' => $request->state,
-            'type' => $request->type,
             'contact_person_phone_number' => $request->contact_person_phone_number,
             'contact_person_email' => $request->contact_person_email,
+            'bank_id' => $request->bank,
+            'account_name' => $request->account_name,
+            'account_number' => $request->account_number,
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
         );
-        $result = DB::table('partner')->insert($data);
+        $result = DB::table('aggregator')->insert($data);
         if ($result) {
-            return response()->json(['status' => 1, 'msg' => 'New Partner has been successfully created.']);
+            return response()->json(['status' => 1, 'msg' => 'New Aggregator has been successfully created.']);
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Partner  $partner
+     * @param  \App\Models\Aggregator  $aggregator
      * @return \Illuminate\Http\Response
      */
-    public function show(Partner $partner)
+    public function show(Aggregator $aggregator)
     {
         //
     }
@@ -122,63 +125,67 @@ class PartnerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Partner  $partner
+     * @param  \App\Models\Aggregator  $aggregator
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $partnerDetails = Partner::find($id);
-        return response()->json(['details' => $partnerDetails]);
+        $aggregatorDetails = Aggregator::find($id);
+        return response()->json(['details' => $aggregatorDetails]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Partner  $partner
+     * @param  \App\Models\Aggregator  $aggregator
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Partner $partner)
+    public function update(Request $request, Aggregator $aggregator)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'address' => 'required|max:255',
-            'contact_person_first_name' => 'required|max:255',
+            'contact_person_name' => 'required|max:255',
             'contact_person_email' => 'required|email|max:255',
             'contact_person_phone_number' => 'required|digits:11',
             'state' => 'required|numeric',
-            'type' => 'required'
+            'bank' => 'required|numeric',
+            'account_name' => 'required|max:255',
+            'account_number' => 'required|digits:11'
         ]);
 
         if (!$validator->passes()) {
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
-        $partner = Partner::find($request->id);
-        $partnerRecordByEmail =  Partner::where('contact_person_email', $request->contact_person_email)->first();
-        if ($partnerRecordByEmail && ($partnerRecordByEmail->id != $partner->id)) {
+        $aggregator = Aggregator::find($request->id);
+        $aggregatorRecordByEmail =  Aggregator::where('contact_person_email', $request->contact_person_email)->first();
+        if ($aggregatorRecordByEmail && ($aggregatorRecordByEmail->id != $aggregator->id)) {
             return response()->json(['status' => 0, 'error' => array('contact_person_email' => array('The contact person email already exist in the database.'))]);
         }
 
-        $partnerRecordByPhoneNo =  Partner::where('contact_person_phone_number', $request->contact_person_phone_number)->first();
-        if ($partnerRecordByPhoneNo && ($partnerRecordByPhoneNo->id != $partner->id)) {
+        $aggregatorRecordByPhoneNo =  Aggregator::where('contact_person_phone_number', $request->contact_person_phone_number)->first();
+        if ($aggregatorRecordByPhoneNo && ($aggregatorRecordByPhoneNo->id != $aggregator->id)) {
             return response()->json(['status' => 0, 'error' => array('contact_person_phone_number' => array('The contact person phone number already exist in the database.'))]);
         }
 
         $data = array(
             'name' => $request->name,
             'address' => $request->address,
-            'contact_person_first_name' => $request->contact_person_first_name,
-            'contact_person_last_name' => $request->contact_person_last_name,
+            'contact_person_name' => $request->contact_person_name,
             'state_id' => $request->state,
-            'type' => $request->type,
             'contact_person_phone_number' => $request->contact_person_phone_number,
             'contact_person_email' => $request->contact_person_email,
+            'bank_id' => $request->bank,
+            'account_name' => $request->account_name,
+            'account_number' => $request->account_number,
+            'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
         );
         try {
-            $result = DB::table('partner')->where('id', $request->id)->update($data);
+            $result = DB::table('aggregator')->where('id', $request->id)->update($data);
 
-            return response()->json(['status' => 1, 'msg' => 'Partner details has been successfully Updated.']);
+            return response()->json(['status' => 1, 'msg' => 'Aggregator details has been successfully Updated.']);
         } catch (Exception $ex) {
             Log::error($ex->getMessage());
             return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
@@ -188,10 +195,10 @@ class PartnerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Partner  $partner
+     * @param  \App\Models\Aggregator  $aggregator
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Partner $partner)
+    public function destroy(Aggregator $aggregator)
     {
         //
     }
