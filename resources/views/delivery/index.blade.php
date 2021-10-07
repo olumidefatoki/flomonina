@@ -39,13 +39,14 @@ Flomuvina | Delivery
                             <thead>
                                 <tr>
                                     <th>S/N</th>
-                                    <th>Buyer</th>
                                     <th>Partner</th>
+                                    <th>Aggregator</th>
+                                    <th>Processor</th>
                                     <th>Commodity</th>
                                     <th>Truck No</th>
                                     <th nowrap>Accepted Quantity(kg)</th>
-                                    <th nowrap>Partner Amount(&#8358;)</th>
                                     <th nowrap>Discounted Amount(&#8358;)</th>
+                                    <th nowrap>Aggregator Amount(&#8358;)</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -188,20 +189,27 @@ Flomuvina | Delivery
                     searchable: false
                 },
                 {
-                    data: 'buyer_name',
-                    name: 'buyer_name',
+                    data: 'partner',
+                    name: 'partner',
                     orderable: false,
                     searchable: false
                 },
                 {
-                    data: 'partner_name',
-                    name: 'partner_name',
+                    data: 'aggregator',
+                    name: 'aggregator',
+                    orderable: false,
+                    searchable: false
+                },
+
+                {
+                    data: 'processor',
+                    name: 'processor',
                     orderable: false,
                     searchable: false
                 },
                 {
-                    data: 'commodity_name',
-                    name: 'commodity_name',
+                    data: 'commodity',
+                    name: 'commodity',
                     orderable: false,
                     searchable: false
                 },
@@ -217,12 +225,7 @@ Flomuvina | Delivery
                     orderable: false,
                     searchable: false
                 },
-                {
-                    data: 'partner_amount',
-                    name: 'partner_amount',
-                    orderable: false,
-                    searchable: false
-                },
+
                 {
                     data: 'discounted_amount',
                     name: 'discounted_amount',
@@ -230,8 +233,14 @@ Flomuvina | Delivery
                     searchable: false
                 },
                 {
-                    data: 'status_name',
-                    name: 'status_name',
+                    data: 'aggregator_amount',
+                    name: 'aggregator_amount',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'status',
+                    name: 'status',
                     orderable: false,
                     searchable: false
                 },

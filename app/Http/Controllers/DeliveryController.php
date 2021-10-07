@@ -32,7 +32,7 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-        $dispatchs = Dispatch::all();
+        $dispatchs = Dispatch::where('status_id', 3)->get();
         $commodities = Commodity::all();
         $aggregator = Aggregator::all();
         $partners = Partner::all();
@@ -56,9 +56,9 @@ class DeliveryController extends Controller
             ->join('status', 'status.id', '=', 'delivery.status_id')
             ->orderBy('dispatch.id', 'desc')
             ->get([
-                'delivery.*', 'trade.price', 'dispatch.truck_number',
-                'partner.name As partner_name', 'status.name As status_name',
-                'aggregator.name As buyer_name', 'commodity.name As commodity_name'
+                'delivery.*', 'trade.price', 'dispatch.truck_number', 'trade.food_processor As processor',
+                'partner.name As partner', 'status.name As status',
+                'aggregator.name As aggregator', 'commodity.name As commodity'
             ]);
         return DataTables::of($deliveries)
             ->addIndexColumn()
@@ -71,8 +71,8 @@ class DeliveryController extends Controller
             })->rawColumns(['actions'])
             ->editColumn('accepted_quantity', function ($item) {
                 return number_format($item->accepted_quantity);
-            })->editColumn('partner_amount', function ($item) {
-                return number_format($item->partner_price * $item->accepted_quantity);
+            })->editColumn('aggregator_amount', function ($item) {
+                return number_format($item->aggregator_price * $item->accepted_quantity);
             })->editColumn('discounted_amount', function ($item) {
                 return number_format($item->partner_price * $item->accepted_quantity);
             })->make(true);
@@ -105,7 +105,7 @@ class DeliveryController extends Controller
             'dispatch' => 'required|numeric',
             'accepted_quantity' => ['required', new DecimalValidator()],
             'no_of_bags_rejected' => 'required|numeric',
-            'partner_price' => ['required', new DecimalValidator()],
+            'aggregator_price' => ['required', new DecimalValidator()],
             'discounted_price' => ['required', new DecimalValidator()],
             'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -114,12 +114,12 @@ class DeliveryController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
-        $orderPrice = Dispatch::join('buyer_order', 'buyer_order_id', '=', 'buyer_order.id')
+        $tradePrice = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
             ->where('dispatch.id', '=', $request->dispatch)
-            ->get(['buyer_order.price'])
+            ->get(['trade.price'])
             ->first();
 
-        if ($request->partner_price > $orderPrice->price) {
+        if ($request->partner_price > $tradePrice->price) {
             return response()->json(['status' => 0, 'error' => array('partner_price' => array('The Partner Price is greater than the Order Price. '))]);
         }
 
@@ -134,18 +134,20 @@ class DeliveryController extends Controller
                 'dispatch_id' => $request->dispatch,
                 'accepted_quantity' => $request->accepted_quantity,
                 'no_of_bags_rejected' => $request->no_of_bags_rejected,
-                'partner_price' => $request->partner_price,
+                'aggregator_price' => $request->aggregator_price,
                 'discounted_price' => $request->discounted_price,
                 'way_ticket' => $upload,
-                'order_price' => $orderPrice->price,
-                'revenue_price' => $orderPrice->price - $request->partner_price - $request->discounted_price,
+                'trade_price' => $tradePrice->price,
+                'margin' => $tradePrice->price - $request->aggregator_price - $request->discounted_price,
                 'status_id' => 8,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             );
             $result = DB::table('delivery')->insert($data);
+            $dispatch = array('status_id' => 5);
+            DB::table('dispatch')->where('id', $request->dispatch)->update($dispatch);
             if ($result) {
-                return response()->json(['status' => 1, 'msg' => 'New Delivery has been successfully upload.']);
+                return response()->json(['status' => 1, 'msg' => 'Way Ticket has been successfully upload.']);
             }
         }
     }

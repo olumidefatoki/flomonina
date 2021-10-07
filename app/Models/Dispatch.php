@@ -19,8 +19,8 @@ class Dispatch extends Model
     {
         return $this->belongsTo('App\Models\Trade');
     }
-    public function partner()
+    public function aggregator()
     {
-        return $this->belongsTo('App\Models\Partner');
+        return $this->belongsTo('App\Models\aggregator');
     }
 }
