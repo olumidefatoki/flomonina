@@ -59,7 +59,7 @@ class TradeController extends Controller
             ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
             ->join('status', 'status.id', '=', 'trade.status_id')
             ->join('users', 'users.id', '=', 'trade.created_by')
-            ->orderBy('trade.id', 'desc')
+            ->orderBy('trade.created_at', 'desc')
             ->get([
                 'trade.*', 'state.name AS state_name', 'status.name As status', 'users.name As created_by',
                 'partner.name As partner', 'commodity.name As commodity_name'
@@ -114,6 +114,10 @@ class TradeController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
+        if (empty($request->date)) {
+            $request->date = now();
+        }
+
         $data = array(
             'partner_id' => $request->partner,
             'food_processor' => $request->processor,
@@ -125,6 +129,7 @@ class TradeController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status_id' => 2,
+            'created_at' => $request->date,
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
         );

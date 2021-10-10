@@ -54,7 +54,7 @@ class DeliveryController extends Controller
             ->join('partner', 'partner.id', '=', 'trade.partner_id')
             ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
             ->join('status', 'status.id', '=', 'delivery.status_id')
-            ->orderBy('dispatch.id', 'desc')
+            ->orderBy('dispatch.created_at', 'desc')
             ->get([
                 'delivery.*', 'trade.price', 'dispatch.truck_number', 'trade.food_processor As processor',
                 'partner.name As partner', 'status.name As status',
@@ -75,7 +75,12 @@ class DeliveryController extends Controller
                 return number_format($item->aggregator_price * $item->accepted_quantity);
             })->editColumn('discounted_amount', function ($item) {
                 return number_format($item->partner_price * $item->accepted_quantity);
-            })->make(true);
+            })->editColumn('created_at', function ($item) {
+                if (empty($item->created_at))
+                    return $item->created_at;
+                return date('Y-m-d H:i:s', strtotime($item->created_at));
+            })
+            ->make(true);
     }
 
     public function getDeliveryDetails($id)
@@ -114,20 +119,28 @@ class DeliveryController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
-        $tradePrice = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
+        $trade = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
+            ->join('aggregator', 'aggregator_id', '=', 'aggregator.id')
+            ->join('partner', 'partner_id', '=', 'partner.id')
             ->where('dispatch.id', '=', $request->dispatch)
-            ->get(['trade.price'])
+            ->get(['trade.price', 'aggregator.name As aggregator', 'partner.name As partner'])
             ->first();
 
-        if ($request->partner_price > $tradePrice->price) {
+
+        if ($request->partner_price > $trade->price) {
             return response()->json(['status' => 0, 'error' => array('partner_price' => array('The Partner Price is greater than the Order Price. '))]);
         }
 
-        $path = 'tickets/';
+        $path = 'tickets';
         $file = $request->file('way_ticket');
-        $file_name = date('YmdHis') . '_' . $file->getClientOriginalName();
+        $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
+
 
         $upload = $file->storeAs($path, $file_name, 'public');
+
+        if (empty($request->date)) {
+            $request->date = now();
+        }
 
         if ($upload) {
             $data = array(
@@ -137,9 +150,10 @@ class DeliveryController extends Controller
                 'aggregator_price' => $request->aggregator_price,
                 'discounted_price' => $request->discounted_price,
                 'way_ticket' => $upload,
-                'trade_price' => $tradePrice->price,
-                'margin' => $tradePrice->price - $request->aggregator_price - $request->discounted_price,
+                'trade_price' => $trade->price,
+                'margin' => $trade->price - $request->aggregator_price - $request->discounted_price,
                 'status_id' => 8,
+                'created_at' => $request->date,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             );

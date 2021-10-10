@@ -2,6 +2,9 @@
 @section('title')
 Flomuvina | Dispatch
 @endsection
+@section('link')
+<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+@endsection
 @section('content')
 <div class="container-fluid">
     <!-- ============================================================== -->
@@ -47,6 +50,7 @@ Flomuvina | Dispatch
                                     <th>Driver Phone Number</th>
                                     <th>Driver Name</th>
                                     <th>Status</th>
+                                    <th>Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -67,8 +71,15 @@ Flomuvina | Dispatch
 
 </div>
 @endsection
+
 @section('script')
+<script src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
+</script>
 <script>
+    $('#date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
     $(function() {
 
         $("#create_dispatch_form").on('submit', function(e) {
@@ -195,7 +206,12 @@ Flomuvina | Dispatch
                     orderable: false,
                     searchable: false
                 },
-
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: 'actions',
                     name: 'actions',

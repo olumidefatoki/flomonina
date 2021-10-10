@@ -52,8 +52,7 @@ Flomuvina | Trade
                                     <th>End Date</th>
                                     <th>Status</th>
                                     <th>Created By</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
+                                    <th>Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -92,6 +91,10 @@ Flomuvina | Trade
         time: false
     });
     $('#edit_end_date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
+    $('#date').bootstrapMaterialDatePicker({
         weekStart: 0,
         time: false
     });
@@ -231,12 +234,6 @@ Flomuvina | Trade
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'updated_at',
-                    name: 'updated_at',
                     orderable: false,
                     searchable: false
                 },

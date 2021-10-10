@@ -49,9 +49,9 @@ class DispatchController extends Controller
             ->join('status', 'status.id', '=', 'dispatch.status_id')
             ->join('aggregator', 'aggregator.id', '=', 'dispatch.aggregator_id')
             ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
-            ->orderBy('dispatch.id', 'desc')
+            ->orderBy('dispatch.created_at', 'desc')
             ->get([
-                'trade.*', 'dispatch.*', 'partner.name As partner', 'state.name As state', 'status.name As status',
+                'trade.food_processor', 'dispatch.*', 'partner.name As partner', 'state.name As state', 'status.name As status',
                 'aggregator.name As aggregator', 'commodity.name As commodity'
             ]);
         return DataTables::of($dispatchs)
@@ -60,6 +60,10 @@ class DispatchController extends Controller
                 return '<div class="btn-group">
                                                 <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editDispatchBtn">Edit</button> 
                                           </div>';
+            })->editColumn('created_at', function ($item) {
+                if (empty($item->created_at))
+                    return $item->created_at;
+                return date('Y-m-d H:i:s', strtotime($item->created_at));
             })->rawColumns(['actions'])
             ->editColumn('number_of_bags', function ($item) {
                 return number_format($item->number_of_bags);
@@ -99,6 +103,10 @@ class DispatchController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
+        if (empty($request->date)) {
+            $request->date = now();
+        }
+
         $data = array(
             'trade_id' => $request->trade,
             'aggregator_id' => $request->aggregator,
@@ -108,6 +116,7 @@ class DispatchController extends Controller
             'driver_number' => $request->driver_phone_number,
             'state_id' => $request->state,
             'pickup_location' => $request->pickup_location,
+            'created_at' => $request->date,
             'status_id' => 3,
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),

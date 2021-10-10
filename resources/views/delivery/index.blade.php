@@ -2,6 +2,9 @@
 @section('title')
 Flomuvina | Delivery
 @endsection
+@section('link')
+<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+@endsection
 @section('content')
 <div class="container-fluid">
     <!-- ============================================================== -->
@@ -48,6 +51,7 @@ Flomuvina | Delivery
                                     <th nowrap>Discounted Amount(&#8358;)</th>
                                     <th nowrap>Aggregator Amount(&#8358;)</th>
                                     <th>Status</th>
+                                    <th>Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -69,7 +73,13 @@ Flomuvina | Delivery
 </div>
 @endsection
 @section('script')
+<script src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
+</script>
 <script>
+    $('#date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
     $(function() {
         $("#create_delivery_form").on('submit', function(e) {
             e.preventDefault();
@@ -244,7 +254,12 @@ Flomuvina | Delivery
                     orderable: false,
                     searchable: false
                 },
-
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: 'actions',
                     name: 'actions',
