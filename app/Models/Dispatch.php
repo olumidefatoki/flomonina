@@ -21,6 +21,6 @@ class Dispatch extends Model
     }
     public function aggregator()
     {
-        return $this->belongsTo('App\Models\aggregator');
+        return $this->belongsTo('App\Models\Aggregator');
     }
 }

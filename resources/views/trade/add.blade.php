@@ -10,121 +10,89 @@
                     <form class="form-horizontal" method="post" action="{{ route('trade.store') }}" id="create_trade_form">
                         @csrf
                         <div class="form pt-3">
-                            <div class="form-group">
-                                <label>Partner</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <select id="formGender" name="partner" class="form-control select">
-                                            <option selected disabled>Select a Partner</option>
-                                            @foreach ($partners as $partner)
-                                            <option value="{{ $partner->id }}">
-                                                {{ $partner->name }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text partner_error "></span>
+                            <span class="text-danger error-text error_message "></span>
+                            <div class="form-group row">
+                                <span class="text-danger error-text"></span>
+                                <label class="col-5 col-form-label">Partner</label>
+                                <div class="col-7">
+                                    <select id="formGender" name="partner" class="form-control select">
+                                        <option selected disabled>Select a Partner</option>
+                                        @foreach ($partners as $partner)
+                                        <option value="{{ $partner->id }}">
+                                            {{ $partner->name }}
+                                        </option>
+                                        @endforeach
+                                    </select><span class="text-danger error-text partner_error "></span>
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Type</label>
+                                <div class="col-7">
+                                    <select id="trade_type" name="type" class="form-control select">
+                                        <option selected disabled>Select</option>
+                                        <option value="Prefunded">Prefunded</option>
+                                        <option value="Direct sourcing">Direct sourcing</option>
+                                    </select><span class="text-danger error-text type_error "></span>
+                                </div>
+
+                            </div>
+                            <div class="form-group row" id="amount" style="display:none">
+                                <label class="col-5 col-form-label">Prefunded Amount</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" name="prefunded_amount" placeholder="Amount">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Processor</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <select id="formGender" name="processor" class="form-control select">
-                                            <option selected disabled>Select a Processor</option>
-                                            @foreach ($processors as $processor)
-                                            <option value="{{ $processor->name }}">
-                                                {{ $processor->name }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text processor_error "></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Commodity</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <select id="formGender" name="commodity" class="form-control select">
-                                            <option selected disabled>Select a Commodity</option>
-                                            @foreach ($commodities as $commodity)
-                                            <option value="{{ $commodity->id }}">
-                                                {{ $commodity->name }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text commodity_error "></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Price</label>
-                                <div class="input-group mb-3">
+                            <div class="form-group row" id="">
+                                <label class="col-5 col-form-label">Margin(kg)</label>
+                                <div class="col-7">
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text">&#8358;</span></div>
-                                        <input type="text" class="form-control" name="price" placeholder="Price">
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text price_error"></span>
+                                        <input type="text" class="form-control" name="margin" placeholder="Margin">
+                                    </div><span class="text-danger error-text margin_error"></span>
 
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <div class="input-group mb-3">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Quantity</label>
+                                <div class="col-7">
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text">MT</span></div>
                                         <input type="text" class="form-control" name="quantity" placeholder="Quantity">
                                     </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text quantity_error"></span>
+                                    <span class="text-danger error-text quantity_error"></span>
+
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Start Date</label>
+                                <div class="col-7">
+                                    <input type="text" name="start_date" class="form-control" placeholder="Start Date" id="start_date">
+                                    <span class="text-danger error-text start_date_error"></span>
 
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>State</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <select id="formGender" name="state" class="form-control select">
-                                            <option selected disabled>Select a State</option>
-                                            @foreach ($states as $state)
-                                            <option value="{{ $state->id }}">
-                                                {{ $state->name }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text state_error "></span>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">End Date</label>
+                                <div class="col-7">
+                                    <input type="text" name="end_date" class="form-control" placeholder="End Date" id="end_date">
+                                    <span class="text-danger error-text end_date_error"></span>
+
                                 </div>
+
                             </div>
-                            <div class="form-group">
-                                <label>Address</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="address" placeholder="Delivery Address">
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text address_error"></span>
+
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Date</label>
+                                <div class="col-7">
+                                    <input type="text" name="date" class="form-control" placeholder="Date" id="date">
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Start Date</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <input type="text" name="start_date" class="form-control" placeholder="Start Date" id="start_date">
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text start_date_error"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>End Date</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <input type="text" name="end_date" class="form-control" placeholder="End Date" id="end_date">
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text end_date_error"></span>
-                                </div>
+                                <span class="text-danger error-text date_error"></span>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-success mr-2">Create</button>
+                                <button type="submit" class="btn btn-success mr-2" id="btnSubmit">Create</button>
+                                <div id="loading" style="display:none"> <img src="{{ URL::to('assets/images/ajax-loader.gif') }}" alt="" /></div>
                                 <button type="button" class="btn btn-dark waves-effect" data-dismiss="modal">Cancel</button>
                             </div>
                         </div>

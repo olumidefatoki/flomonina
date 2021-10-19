@@ -49,7 +49,7 @@
 
                             <div class="col-md-12 m-b-20">
                                 <select id="formGender" name="state" class="form-control select">
-                                    <option selected disabled>Select a State</option>
+                                    <option selected disabled>Partner State</option>
                                     @foreach ($states as $state)
                                     <option value="{{ $state->id }}">
                                         {{ $state->name }}
@@ -60,7 +60,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-success mr-2">Update</button>
+                            <button type="submit" class="btn btn-success mr-2" id="btnUpdate">Update</button>
+                            <div id="loadingUpdate" style="display:none"> <img src="{{ URL::to('assets/images/ajax-loader.gif') }}" alt="" /></div>
                             <button type="button" class="btn btn-dark waves-effect" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>

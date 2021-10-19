@@ -85,7 +85,7 @@ class AggregatorController extends Controller
             'state' => 'required|numeric',
             'bank' => 'required|numeric',
             'account_name' => 'required|max:255',
-            'account_number' => 'required|digits:11'
+            'account_number' => 'required|digits:10'
         ]);
 
         if (!$validator->passes()) {
@@ -152,7 +152,7 @@ class AggregatorController extends Controller
             'state' => 'required|numeric',
             'bank' => 'required|numeric',
             'account_name' => 'required|max:255',
-            'account_number' => 'required|digits:11'
+            'account_number' => 'required|digits:10'
         ]);
 
         if (!$validator->passes()) {

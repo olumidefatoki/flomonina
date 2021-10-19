@@ -54,15 +54,12 @@ class TradeController extends Controller
 
     public function getTradeList(Request $request)
     {
-        $trades = Trade::join('state', 'state.id', '=', 'trade.state_id')
-            ->join('partner', 'partner.id', '=', 'trade.partner_id')
-            ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
+        $trades = Trade::join('partner', 'partner.id', '=', 'trade.partner_id')
             ->join('status', 'status.id', '=', 'trade.status_id')
             ->join('users', 'users.id', '=', 'trade.created_by')
-            ->orderBy('trade.id', 'desc')
+            ->orderBy('trade.created_at', 'desc')
             ->get([
-                'trade.*', 'state.name AS state_name', 'status.name As status', 'users.name As created_by',
-                'partner.name As partner', 'commodity.name As commodity_name'
+                'trade.*',  'status.name As status', 'users.name As created_by', 'partner.name As partner'
             ]);
         return DataTables::of($trades)
             ->addIndexColumn()
@@ -73,16 +70,13 @@ class TradeController extends Controller
             })->rawColumns(['actions'])
             ->editColumn('quantity', function ($item) {
                 return number_format($item->quantity);
+            })->editColumn('prefunded_amount', function ($item) {
+                return number_format($item->prefunded_amount);
             })->editColumn('created_at', function ($item) {
                 if (empty($item->created_at))
                     return $item->created_at;
                 return date('Y-m-d H:i:s', strtotime($item->created_at));
-            })->editColumn('updated_at', function ($item) {
-                if (empty($item->updated_at))
-                    return $item->updated_at;
-                return date('Y-m-d H:i:s', strtotime($item->updated_at));
-            })
-            ->editColumn('start_date', function ($item) {
+            })->editColumn('start_date', function ($item) {
                 return date('Y-m-d', strtotime($item->start_date));
             })->editColumn('end_date', function ($item) {
                 return date('Y-m-d', strtotime($item->end_date));
@@ -100,12 +94,9 @@ class TradeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'partner' => 'required|numeric',
-            'processor' => 'required',
-            'address' => 'required|max:255',
+            'type' => 'required',
             'quantity' => ['required', new DecimalValidator()],
-            'price' => ['required', new DecimalValidator()],
-            'commodity' => 'required|numeric',
-            'state' => 'required|numeric',
+            'margin' => ['required', new DecimalValidator()],
             'start_date' => 'required|date_format:Y-m-d',
             'end_date' => 'required|date_format:Y-m-d',
         ]);
@@ -114,23 +105,29 @@ class TradeController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
+        if (empty($request->date)) {
+            $request->date = now();
+        }
+
         $data = array(
             'partner_id' => $request->partner,
-            'food_processor' => $request->processor,
-            'delivery_location' => $request->address,
+            'type' => $request->type,
+            'prefunded_amount' => $request->prefunded_amount,
             'quantity' => $request->quantity,
-            'price' => $request->price,
-            'commodity_id' => $request->commodity,
-            'state_id' => $request->state,
+            'margin' => $request->margin,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status_id' => 2,
+            'created_at' => $request->date,
             'created_by' => Auth::id(),
-            'updated_by' => Auth::id(),
         );
-        $result = DB::table('trade')->insert($data);
-        if ($result) {
-            return response()->json(['status' => 1, 'msg' => 'New Trade has been successfully created.']);
+        try {
+            $result = DB::table('trade')->insert($data);
+            if ($result)
+                return response()->json(['status' => 1, 'msg' => 'New Trade has been successfully created.']);
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
         }
     }
 
@@ -168,12 +165,9 @@ class TradeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'partner' => 'required|numeric',
-            'processor' => 'required',
-            'address' => 'required|max:255',
+            'type' => 'required',
             'quantity' => ['required', new DecimalValidator()],
-            'price' => ['required', new DecimalValidator()],
-            'commodity' => 'required|numeric',
-            'state' => 'required|numeric',
+            'margin' => ['required', new DecimalValidator()],
             'start_date' => 'required|date_format:Y-m-d',
             'end_date' => 'required|date_format:Y-m-d',
         ]);
@@ -183,12 +177,10 @@ class TradeController extends Controller
         }
         $data = array(
             'partner_id' => $request->partner,
-            'food_processor' => $request->processor,
-            'delivery_location' => $request->address,
+            'type' => $request->type,
+            'prefunded_amount' => $request->prefunded_amount,
             'quantity' => $request->quantity,
-            'price' => $request->price,
-            'commodity_id' => $request->commodity,
-            'state_id' => $request->state,
+            'margin' => $request->margin,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'updated_by' => Auth::id(),

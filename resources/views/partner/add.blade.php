@@ -18,9 +18,8 @@
                             <div class="col-md-12 m-b-20">
                                 <select id="formGender" name="type" class="form-control select">
                                     <option selected disabled>Select</option>
-                                    <option value="financier">Financier</option>
-                                    <option value="processor">Processor</option>
-
+                                    <option value="FINANCIER">Financier</option>
+                                    <option value="PROCESSOR">Processor</option>
                                 </select>
                                 <span style="font-size: 10px;" class="text-danger error-text state_error "></span>
                             </div>
@@ -48,7 +47,7 @@
 
                             <div class="col-md-12 m-b-20">
                                 <select id="formGender" name="state" class="form-control select">
-                                    <option selected disabled>Select a State</option>
+                                    <option selected disabled>Partner State</option>
                                     @foreach ($states as $state)
                                     <option value="{{ $state->id }}">
                                         {{ $state->name }}
@@ -59,7 +58,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-success mr-2">Create</button>
+                            <button type="submit" class="btn btn-success mr-2" id="btnSubmit">Create</button>
+                            <div id="loading" style="display:none"> <img src="{{ URL::to('assets/images/ajax-loader.gif') }}" alt="" /></div>
                             <button type="button" class="btn btn-dark waves-effect" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>

@@ -7,11 +7,7 @@ use DataTables;
 use Exception;
 use App\Models\Delivery;
 use App\Models\Dispatch;
-use App\Models\State;
-use App\Models\Aggregator;
 use App\Models\Partner;
-use App\Models\Commodity;
-use App\Models\Buyer;
 use App\Rules\DecimalValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -33,16 +29,11 @@ class DeliveryController extends Controller
     public function index()
     {
         $dispatchs = Dispatch::where('status_id', 3)->get();
-        $commodities = Commodity::all();
-        $aggregator = Aggregator::all();
-        $partners = Partner::all();
         return view(
             'delivery.index',
             [
                 'dispatchs' => $dispatchs,
-                'commodities' => $commodities,
-                'aggregator' => $aggregator,
-                'partners' => $partners,
+                'processors' => Partner::where('type', 'PROCESSOR')->get(),
             ]
         );
     }
@@ -52,11 +43,11 @@ class DeliveryController extends Controller
             ->join('trade', 'trade.id', '=', 'dispatch.trade_id')
             ->join('aggregator', 'aggregator.id', '=', 'dispatch.aggregator_id')
             ->join('partner', 'partner.id', '=', 'trade.partner_id')
-            ->join('commodity', 'commodity.id', '=', 'trade.commodity_id')
+            ->join('commodity', 'commodity.id', '=', 'dispatch.commodity_id')
             ->join('status', 'status.id', '=', 'delivery.status_id')
-            ->orderBy('dispatch.id', 'desc')
+            ->orderBy('dispatch.created_at', 'desc')
             ->get([
-                'delivery.*', 'trade.price', 'dispatch.truck_number', 'trade.food_processor As processor',
+                'delivery.*', 'dispatch.truck_number', 'delivery.processor As processor',
                 'partner.name As partner', 'status.name As status',
                 'aggregator.name As aggregator', 'commodity.name As commodity'
             ]);
@@ -75,7 +66,12 @@ class DeliveryController extends Controller
                 return number_format($item->aggregator_price * $item->accepted_quantity);
             })->editColumn('discounted_amount', function ($item) {
                 return number_format($item->partner_price * $item->accepted_quantity);
-            })->make(true);
+            })->editColumn('created_at', function ($item) {
+                if (empty($item->created_at))
+                    return $item->created_at;
+                return date('Y-m-d H:i:s', strtotime($item->created_at));
+            })
+            ->make(true);
     }
 
     public function getDeliveryDetails($id)
@@ -103,45 +99,50 @@ class DeliveryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'dispatch' => 'required|numeric',
+            'processor' => 'required|numeric',
             'accepted_quantity' => ['required', new DecimalValidator()],
-            'no_of_bags_rejected' => 'required|numeric',
             'aggregator_price' => ['required', new DecimalValidator()],
             'discounted_price' => ['required', new DecimalValidator()],
-            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'processor_price' => ['required', new DecimalValidator()],
+            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
         ]);
 
         if (!$validator->passes()) {
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
-        $tradePrice = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
+        $trade = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
+            ->join('aggregator', 'dispatch.aggregator_id', '=', 'aggregator.id')
+            ->join('partner', 'trade.partner_id', '=', 'partner.id')
             ->where('dispatch.id', '=', $request->dispatch)
-            ->get(['trade.price'])
+            ->get(['aggregator.name As aggregator', 'partner.name As partner'])
             ->first();
 
-        if ($request->partner_price > $tradePrice->price) {
-            return response()->json(['status' => 0, 'error' => array('partner_price' => array('The Partner Price is greater than the Order Price. '))]);
-        }
-
-        $path = 'tickets/';
+        $path = 'upload/tickets/';
         $file = $request->file('way_ticket');
-        $file_name = date('YmdHis') . '_' . $file->getClientOriginalName();
+        $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
 
-        $upload = $file->storeAs($path, $file_name, 'public');
+
+        $upload = $file->move($path, $file_name);
+
+        if (empty($request->date)) {
+            $request->date = now();
+        }
 
         if ($upload) {
             $data = array(
                 'dispatch_id' => $request->dispatch,
                 'accepted_quantity' => $request->accepted_quantity,
-                'no_of_bags_rejected' => $request->no_of_bags_rejected,
                 'aggregator_price' => $request->aggregator_price,
                 'discounted_price' => $request->discounted_price,
+                'trade_price' => $request->processor_price,
+                'processor' => Partner::find($request->processor)->name,
+                'partner_id' => $request->processor,
                 'way_ticket' => $upload,
-                'trade_price' => $tradePrice->price,
-                'margin' => $tradePrice->price - $request->aggregator_price - $request->discounted_price,
+                'margin' => $request->processor_price - $request->aggregator_price,
                 'status_id' => 8,
-                'created_by' => Auth::id(),
-                'updated_by' => Auth::id(),
+                'created_at' => $request->date,
+                'created_by' => Auth::id()
             );
             $result = DB::table('delivery')->insert($data);
             $dispatch = array('status_id' => 5);
@@ -186,12 +187,15 @@ class DeliveryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'dispatch' => 'required|numeric',
+            'processor' => 'required|numeric',
             'accepted_quantity' => ['required', new DecimalValidator()],
             'no_of_bags_rejected' => 'required|numeric',
-            'partner_price' => ['required', new DecimalValidator()],
+            'aggregator_price' => ['required', new DecimalValidator()],
             'discounted_price' => ['required', new DecimalValidator()],
-            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'processor_price' => ['required', new DecimalValidator()],
+            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
         ]);
+
 
         if (!$validator->passes()) {
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
@@ -215,12 +219,13 @@ class DeliveryController extends Controller
             $data = array(
                 'dispatch_id' => $request->dispatch,
                 'accepted_quantity' => $request->accepted_quantity,
-                'no_of_bags_rejected' => $request->no_of_bags_rejected,
-                'partner_price' => $request->partner_price,
+                'aggregator_price' => $request->aggregator_price,
                 'discounted_price' => $request->discounted_price,
+                'trade_price' => $request->processor_price,
+                'processor' => Partner::find($request->processor)->name,
+                'partner_id' => $request->processor,
                 'way_ticket' => $upload,
-                'order_price' => 0,
-                'revenue_price' => 0,
+                'margin' => $request->processor_price - $request->aggregator_price,
                 'status_id' => 8,
                 'updated_by' => Auth::id(),
             );

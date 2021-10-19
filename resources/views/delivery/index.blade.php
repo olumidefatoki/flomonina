@@ -2,6 +2,9 @@
 @section('title')
 Flomuvina | Delivery
 @endsection
+@section('link')
+<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+@endsection
 @section('content')
 <div class="container-fluid">
     <!-- ============================================================== -->
@@ -48,6 +51,7 @@ Flomuvina | Delivery
                                     <th nowrap>Discounted Amount(&#8358;)</th>
                                     <th nowrap>Aggregator Amount(&#8358;)</th>
                                     <th>Status</th>
+                                    <th>Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -69,10 +73,18 @@ Flomuvina | Delivery
 </div>
 @endsection
 @section('script')
+<script src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
+</script>
 <script>
+    $('#date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
     $(function() {
         $("#create_delivery_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnSubmit").css('display', 'none');
+            $("#loadingSubmit").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -84,7 +96,8 @@ Flomuvina | Delivery
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loadingSubmit").css('display', 'none');
+                    $("#btnSubmit").css('display', 'inline');
                     if (data.status == 0) {
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
@@ -110,20 +123,21 @@ Flomuvina | Delivery
             $.get("{{ url('/delivery/edit/') }}" + '/' + id, function(data) {
                 console.log(data.details);
                 $('input[name="id"]').val(data.details.id);
-                $('input[name="name"]').val(data.details.name);
-                $('input[name="address"]').val(data.details.address);
-                $('input[name="partner_price"]').val(data.details.partner_price);
                 $('input[name="discounted_price"]').val(data.details.discounted_price);
-                $('input[name="no_of_bags_rejected"]').val(data.details.no_of_bags_rejected);
-                $('input[name="accepted_quantity"]').val(data.details
-                    .accepted_quantity);
-                $('select[name="state"]').val(data.details.accepted_quantity);
+                $('input[name="processor_price"]').val(data.details.trade_price);
+                $('input[name="partner_price"]').val(data.details.partner_price);
+                $('input[name="aggregator_price"]').val(data.details.aggregator_price);
+                $('input[name="accepted_quantity"]').val(data.details.accepted_quantity);
+                $('select[name="dispatch"]').val(data.details.dispatch_id);
+                $('select[name="processor"]').val(data.details.partner_id);
 
             }, 'json');
         });
 
         $("#update_delivery_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnUpdate").css('display', 'none');
+            $("#loadingUpdate").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -135,7 +149,8 @@ Flomuvina | Delivery
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loadingUpdate").css('display', 'none');
+                    $("#btnUpdate").css('display', 'inline');
                     if (data.status == 1) {
                         $('#delivery-table').DataTable().ajax.reload(null, false);
                         $('#update_delivery_form')[0].reset();
@@ -152,25 +167,6 @@ Flomuvina | Delivery
             });
         });
 
-        $('select[name="dispatch"]').on('change', function() {
-            $("#loading").css("display", "inline-block");
-            var logisticsId = $(this).val();
-            var dispatchId = $(this).val();
-            if (dispatchId) {
-                $.ajax({
-                    url: "{{ url('/dispatch/details/') }}" + '/' + dispatchId,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $('select[name="aggregator_id"]').empty();
-                        $('input[name="aggregator"]').val(data.aggregator);
-                        $('input[name="commodity"]').val(data.commodity);
-                        $('input[name="partner"]').val(data.partner);
-                        $("#loading").css("display", "none");
-                    }
-                });
-            }
-        });
 
         var table = $('#delivery-table').DataTable({
             processing: true,
@@ -244,7 +240,12 @@ Flomuvina | Delivery
                     orderable: false,
                     searchable: false
                 },
-
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: 'actions',
                     name: 'actions',

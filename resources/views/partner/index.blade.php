@@ -70,6 +70,8 @@ Flomuvina | Partner
     $(function() {
         $("#create_partner_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnSubmit").css('display', 'none');
+            $("#loading").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -81,7 +83,8 @@ Flomuvina | Partner
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loading").css('display', 'none');
+                    $("#btnSubmit").css('display', 'inline');
                     if (data.status == 0) {
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
@@ -192,6 +195,8 @@ Flomuvina | Partner
 
         $("#update_partner_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnUpdate").css('display', 'none');
+            $("#loadingUpdate").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -203,7 +208,8 @@ Flomuvina | Partner
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loadingUpdate").css('display', 'none');
+                    $("#btnUpdate").css('display', 'inline');
                     if (data.status == 1) {
                         $('#partners-table').DataTable().ajax.reload(null, false);
                         $('#update_partner_form')[0].reset();

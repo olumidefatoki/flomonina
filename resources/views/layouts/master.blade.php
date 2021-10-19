@@ -9,13 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- Favicon icon --> 
+    <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ URL::to('assets/images/flomuvina_logo.jpeg') }}">
     <title>@yield('title')</title>
     @yield('link')
-    
-    <link href="URL::to('assets/node_modules/Magnific-Popup-master/dist/magnific-popup.css') }}" rel="stylesheet">
-
     <!-- Data Table CSS -->
     <link href="{{ URL::to('assets/datatable/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ URL::to('assets/datatable/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
@@ -23,7 +20,13 @@
     <link href="{{ URL::to('assets/toastr/toastr.min.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ URL::to('dist/css/style.min.css') }}" rel="stylesheet">
-    
+    <style>
+        .error-text {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+
 
 </head>
 
@@ -74,7 +77,7 @@
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
-        &copy;	2021
+            &copy; 2021
         </footer>
         <!-- ============================================================== -->
         <!-- End footer -->
@@ -106,7 +109,7 @@
     <script src="{{ URL::to('assets/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ URL::to('assets/toastr/toastr.min.js') }}"></script>
     <!--FooTable init-->
-  @yield('script')
+    @yield('script')
 
 </body>
 

@@ -16,16 +16,18 @@ class CreateBuyerDeliveryTable extends Migration
         Schema::create('delivery', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('dispatch_id');
+            $table->unsignedBigInteger('partner_id');
+            $table->string('processor');
             $table->decimal('accepted_quantity', 13, 2);
             $table->decimal('aggregator_price', 13, 2);
             $table->decimal('discounted_price', 13, 2);
             $table->decimal('trade_price', 13, 2);
             $table->decimal('margin', 13, 2);
-            $table->integer('no_of_bags_rejected');
             $table->string('way_ticket');
             $table->unsignedBigInteger('status_id');
             $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('partner_id')->references('id')->on('partner');
             $table->foreign('dispatch_id')->references('id')->on('dispatch');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');

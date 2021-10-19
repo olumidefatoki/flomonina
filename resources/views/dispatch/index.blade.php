@@ -2,6 +2,9 @@
 @section('title')
 Flomuvina | Dispatch
 @endsection
+@section('link')
+<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+@endsection
 @section('content')
 <div class="container-fluid">
     <!-- ============================================================== -->
@@ -39,14 +42,17 @@ Flomuvina | Dispatch
                                     <th>S/N</th>
                                     <th>Partner</th>
                                     <th>Aggregator</th>
-                                    <th>Processor</th>
                                     <th>Commodity</th>
                                     <th>Number of bags</th>
                                     <th>Pickup State</th>
+                                    <th>Destination State</th>
+                                    <th>Logisitcs Company</th>
                                     <th>Truck No</th>
-                                    <th>Driver Phone Number</th>
                                     <th>Driver Name</th>
+                                    <th>Driver Phone Number</th>
                                     <th>Status</th>
+                                    <th>Expected Arrivial Date</th>
+                                    <th>Dispach Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -67,12 +73,21 @@ Flomuvina | Dispatch
 
 </div>
 @endsection
+
 @section('script')
+<script src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
+</script>
 <script>
+    $('#date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
     $(function() {
 
         $("#create_dispatch_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnSubmit").css('display', 'none');
+            $("#loading").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -84,15 +99,18 @@ Flomuvina | Dispatch
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loading").css('display', 'none');
+                    $("#btnSubmit").css('display', 'inline');
                     if (data.status == 0) {
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
                         });
-                    } else {
+                    } else if (data.status == 1) {
                         $('#dispatch-table').DataTable().ajax.reload(null, false);
                         $('#create_dispatch_form')[0].reset();
                         $('#add-dispatch-modal').modal('hide');
+                    } else {
+                        $('span.error_message').text(data.msg);
                     }
                 }
             });
@@ -111,14 +129,18 @@ Flomuvina | Dispatch
             $.get("{{ url('/dispatch/edit/') }}" + '/' + id, function(data) {
                 console.log(data);
                 $('input[name="id"]').val(data.details.id);
-                $('input[name="pickup_location"]').val(data.details.pickup_location);
+                $('input[name="estimated_arrival_time"]').val(data.details.estimated_arrival_time);
                 $('input[name="driver_phone_number"]').val(data.details.driver_number);
                 $('input[name="driver_name"]').val(data.details.driver_name);
                 $('input[name="truck_number"]').val(data.details.truck_number);
                 $('select[name="trade"]').val(data.details.trade_id);
                 $('select[name="aggregator"]').val(data.details.aggregator_id);
-                $('select[name="state"]').val(data.details.state_id);
+                $('select[name="destination_state"]').val(data.details.destination_state_id);
+                $('select[name="pickup_state"]').val(data.details.pickup_state_id);
+                $('select[name="commodity"]').val(data.details.commodity_id);
                 $('input[name="number_of_bags"]').val(data.details.number_of_bags);
+                $('input[name="logistics_company"]').val(data.details.logistics_company);
+                $('input[name="dispatch_time"]').val(data.details.dispatch_time);
 
             }, 'json');
         });
@@ -148,12 +170,6 @@ Flomuvina | Dispatch
                     name: 'aggregator'
                 },
                 {
-                    data: 'food_processor',
-                    name: 'food_processor',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'commodity',
                     name: 'commodity',
                     orderable: false,
@@ -166,8 +182,20 @@ Flomuvina | Dispatch
                     searchable: false
                 },
                 {
-                    data: 'state',
-                    name: 'state',
+                    data: 'pickupstate',
+                    name: 'pickupstate',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'destState',
+                    name: 'destState',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'logistics_company',
+                    name: 'logistics_company',
                     orderable: false,
                     searchable: false
                 },
@@ -178,20 +206,33 @@ Flomuvina | Dispatch
                     searchable: false
                 },
                 {
-                    data: 'driver_number',
-                    name: 'driver_number',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'driver_name',
                     name: 'driver_name',
                     orderable: false,
                     searchable: false
                 },
                 {
+                    data: 'driver_number',
+                    name: 'driver_number',
+                    orderable: false,
+                    searchable: false
+                },
+
+                {
                     data: 'status',
                     name: 'status',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'estimated_arrival_time',
+                    name: 'estimated_arrival_time',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
                     orderable: false,
                     searchable: false
                 },
@@ -207,6 +248,8 @@ Flomuvina | Dispatch
 
         $("#update_dispatch_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnUpdate").css('display', 'none');
+            $("#loadingUpdate").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -218,7 +261,8 @@ Flomuvina | Dispatch
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+                    $("#loadingUpdate").css('display', 'none');
+                    $("#btnUpdate").css('display', 'inline');
                     if (data.status == 1) {
                         $('#dispatch-table').DataTable().ajax.reload(null, false);
                         $('#update_dispatch_form')[0].reset();

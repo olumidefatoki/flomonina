@@ -42,18 +42,15 @@ Flomuvina | Trade
                                 <tr>
                                     <th>S/N</th>
                                     <th>Partner</th>
-                                    <th>Processor</th>
-                                    <th>Address</th>
-                                    <th>commodity</th>
-                                    <th>price(&#8358;)</th>
+                                    <th>Type</th>
+                                    <th>Prefunded Amount(&#8358;)</th>
+                                    <th>Margin(&#8358;)</th>
                                     <th>Qty(MT)</th>
-                                    <th>State Name</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
                                     <th>Status</th>
                                     <th>Created By</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
+                                    <th>Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -95,9 +92,15 @@ Flomuvina | Trade
         weekStart: 0,
         time: false
     });
+    $('#date').bootstrapMaterialDatePicker({
+        weekStart: 0,
+        time: false
+    });
     $(function() {
         $("#create_trade_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnSubmit").css('display', 'none');
+            $("#loading").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -109,15 +112,18 @@ Flomuvina | Trade
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
-                    if (data.status == 0) {
+                    $("#loading").css('display', 'none');
+                    $("#btnSubmit").css('display', 'inline');
+                    if (data.status == 1) {
+                        $('#trade-table').DataTable().ajax.reload(null, false);
+                        $('#create_trade_form')[0].reset();
+                        $('#add-trade-modal').modal('hide');
+                    } else if (data.status == 0) {
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
                         });
                     } else {
-                        $('#trade-table').DataTable().ajax.reload(null, false);
-                        $('#create_trade_form')[0].reset();
-                        $('#add-trade-modal').modal('hide');
+                        $('span.error_message').text(data.msg);
                     }
                 }
             });
@@ -136,13 +142,11 @@ Flomuvina | Trade
                 $('input[name="id"]').val(data.details.id);
                 $('input[name="end_date"]').val(data.details.end_date.substring(0, 10));
                 $('input[name="start_date"]').val(data.details.start_date.substring(0, 10));
-                $('input[name="address"]').val(data.details.delivery_location);
-                $('input[name="price"]').val(data.details.price);
+                $('input[name="prefunded_amount"]').val(data.details.prefunded_amount);
+                $('input[name="margin"]').val(data.details.margin);
                 $('input[name="quantity"]').val(data.details.quantity);
-                $('select[name="commodity"]').val(data.details.commodity_id);
                 $('select[name="partner"]').val(data.details.partner_id);
-                $('select[name="processor"]').val(data.details.food_processor);
-                $('select[name="state"]').val(data.details.state_id);
+                $('select[name="type"]').val(data.details.type);
 
             }, 'json');
         });
@@ -169,26 +173,22 @@ Flomuvina | Trade
 
                 },
                 {
-                    data: 'food_processor',
-                    name: 'food_processor'
+                    data: 'type',
+                    name: 'type'
 
                 },
 
                 {
-                    data: 'delivery_location',
-                    name: 'delivery_location',
+                    data: 'prefunded_amount',
+                    name: 'prefunded_amount',
                     orderable: false,
                     searchable: false
                 },
+
+
                 {
-                    data: 'commodity_name',
-                    name: 'commodity_name',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'price',
-                    name: 'price',
+                    data: 'margin',
+                    name: 'margin',
                     orderable: false,
                     searchable: false
                 },
@@ -198,12 +198,7 @@ Flomuvina | Trade
                     orderable: false,
                     searchable: false
                 },
-                {
-                    data: 'state_name',
-                    name: 'state_name',
-                    orderable: false,
-                    searchable: false
-                },
+
                 {
                     data: 'start_date',
                     name: 'start_date',
@@ -235,12 +230,6 @@ Flomuvina | Trade
                     searchable: false
                 },
                 {
-                    data: 'updated_at',
-                    name: 'updated_at',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'actions',
                     name: 'actions',
                     orderable: false,
@@ -249,8 +238,17 @@ Flomuvina | Trade
             ]
         });
 
+        $('select[name="type"]').on('change', function() {
+            $("#amount").css("display", "none");
+            var value = $(this).val();
+            if (value == "Prefunded")
+                $("#amount").css("display", "flex");
+        });
+
         $("#update_trade_form").on('submit', function(e) {
             e.preventDefault();
+            $("#btnUpdate").css('display', 'none');
+            $("#loadingUpdate").css('display', 'inline');
             $.ajax({
                 url: $(this).attr('action'),
                 method: $(this).attr('method'),
@@ -262,19 +260,23 @@ Flomuvina | Trade
                     $(document).find('span.error-text').text('');
                 },
                 success: function(data) {
-                    console.log(data);
+
                     if (data.status == 1) {
                         $('#trade-table').DataTable().ajax.reload(null, false);
                         $('#update_trade_form')[0].reset();
                         $('#edit-trade-modal').modal('hide');
                         toastr.success(data.msg);
                     } else if (data.status == 0) {
+
                         $.each(data.error, function(prefix, val) {
                             $('span.' + prefix + '_error').text(val[0]);
                         });
                     } else {
+
                         $('span.error_message').text(data.msg);
                     }
+                    $("#loadingUpdate").css('display', 'none');
+                    $("#btnUpdate").css('display', 'inline');
                 }
             });
         });

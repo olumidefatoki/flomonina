@@ -188,13 +188,18 @@ Flomuvina | Delivery
                                     </div>
                                 </div>
                                 <!--/span-->
+
+                            </div>
+                            <div class="row">
+
                                 <div class="col-md-6">
                                     <div class="form-group row">
-                                        <label class="control-label text-right col-md-6">way tickets:</label>
+                                        <label class="control-label text-right col-md-6">Way tickets:</label>
                                         <div class="col-md-6">
-                                            <p class="form-control-static"><a id="image-popups" class=" btn default btn-outline image-popup-no-margins" href="{{'/storage/app/public/'. $delivery->way_ticket }}">
-                                                    <img src="{{ '/storage/app/public'. $delivery->way_ticket }}" alt="image" class="img-responsive" style="width:50px;Height:50px" />
-                                                    <i class="icon-magnifier"></i></a> </p>
+                                            <a class="image-popup-vertical-fit" href="{{asset( $delivery->way_ticket )}}" title="Way Ticket.">
+                                                <img src="{{asset( $delivery->way_ticket )}}" alt="image" class="img-responsive" />
+                                            </a>
+
                                         </div>
                                     </div>
                                 </div>
@@ -227,7 +232,7 @@ Flomuvina | Delivery
 </div>
 @endsection
 
-@section('link')
+@section('script')
 <script src="{{ URL::to('assets/node_modules/Magnific-Popup-master/dist/jquery.magnific-popup.min.js') }}"></script>
 <script src="{{ URL::to('assets/node_modules/Magnific-Popup-master/dist/jquery.magnific-popup-init.js') }}"></script>
 @endsection
