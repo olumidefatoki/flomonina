@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateDeliveryRequest;
+use Exception;
 use Validator;
 use DataTables;
-use Exception;
+use App\Models\Partner;
 use App\Models\Delivery;
 use App\Models\Dispatch;
-use App\Models\Partner;
-use App\Rules\DecimalValidator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Rules\DecimalValidator;
+use App\Services\DeliveryService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class DeliveryController extends Controller
@@ -37,41 +39,10 @@ class DeliveryController extends Controller
             ]
         );
     }
-    public function getDeliveryList(Request $request)
+
+    public function getDeliveryList(Request $request, DeliveryService $service)
     {
-        $deliveries = Delivery::join('dispatch', 'dispatch_id', '=', 'dispatch.id')
-            ->join('trade', 'trade.id', '=', 'dispatch.trade_id')
-            ->join('aggregator', 'aggregator.id', '=', 'dispatch.aggregator_id')
-            ->join('partner', 'partner.id', '=', 'trade.partner_id')
-            ->join('commodity', 'commodity.id', '=', 'dispatch.commodity_id')
-            ->join('status', 'status.id', '=', 'delivery.status_id')
-            ->orderBy('dispatch.created_at', 'desc')
-            ->get([
-                'delivery.*', 'dispatch.truck_number', 'delivery.processor As processor',
-                'partner.name As partner', 'status.name As status',
-                'aggregator.name As aggregator', 'commodity.name As commodity'
-            ]);
-        return DataTables::of($deliveries)
-            ->addIndexColumn()
-            ->addColumn('actions', function ($row) {
-                return '<div class="btn-group">
-                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editDeliveryBtn">Edit</button>  
-                                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                                <a href="/delivery/details/' . $row['id'] . '"> <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" >View</button> </a>
-                                          </div>';
-            })->rawColumns(['actions'])
-            ->editColumn('accepted_quantity', function ($item) {
-                return number_format($item->accepted_quantity);
-            })->editColumn('aggregator_amount', function ($item) {
-                return number_format($item->aggregator_price * $item->accepted_quantity);
-            })->editColumn('discounted_amount', function ($item) {
-                return number_format($item->partner_price * $item->accepted_quantity);
-            })->editColumn('created_at', function ($item) {
-                if (empty($item->created_at))
-                    return $item->created_at;
-                return date('Y-m-d H:i:s', strtotime($item->created_at));
-            })
-            ->make(true);
+        return $service->getAllDeliveries($request);
     }
 
     public function getDeliveryDetails($id)
@@ -95,62 +66,12 @@ class DeliveryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateDeliveryRequest $request, DeliveryService $service)
     {
-        $validator = Validator::make($request->all(), [
-            'dispatch' => 'required|numeric',
-            'processor' => 'required|numeric',
-            'accepted_quantity' => ['required', new DecimalValidator()],
-            'aggregator_price' => ['required', new DecimalValidator()],
-            'discounted_price' => ['required', new DecimalValidator()],
-            'processor_price' => ['required', new DecimalValidator()],
-            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
-        ]);
-
-        if (!$validator->passes()) {
-            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
+        if ($service->create($request)) {
+            return response()->json(['status' => 1, 'msg' => 'Way Ticket has been successfully upload.']);
         }
-
-        $trade = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
-            ->join('aggregator', 'dispatch.aggregator_id', '=', 'aggregator.id')
-            ->join('partner', 'trade.partner_id', '=', 'partner.id')
-            ->where('dispatch.id', '=', $request->dispatch)
-            ->get(['aggregator.name As aggregator', 'partner.name As partner'])
-            ->first();
-
-        $path = 'upload/tickets/';
-        $file = $request->file('way_ticket');
-        $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
-
-
-        $upload = $file->move($path, $file_name);
-
-        if (empty($request->date)) {
-            $request->date = now();
-        }
-
-        if ($upload) {
-            $data = array(
-                'dispatch_id' => $request->dispatch,
-                'accepted_quantity' => $request->accepted_quantity,
-                'aggregator_price' => $request->aggregator_price,
-                'discounted_price' => $request->discounted_price,
-                'trade_price' => $request->processor_price,
-                'processor' => Partner::find($request->processor)->name,
-                'partner_id' => $request->processor,
-                'way_ticket' => $upload,
-                'margin' => $request->processor_price - $request->aggregator_price,
-                'status_id' => 8,
-                'created_at' => $request->date,
-                'created_by' => Auth::id()
-            );
-            $result = DB::table('delivery')->insert($data);
-            $dispatch = array('status_id' => 5);
-            DB::table('dispatch')->where('id', $request->dispatch)->update($dispatch);
-            if ($result) {
-                return response()->json(['status' => 1, 'msg' => 'Way Ticket has been successfully upload.']);
-            }
-        }
+        return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
     }
 
     /**

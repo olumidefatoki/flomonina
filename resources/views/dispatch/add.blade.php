@@ -129,7 +129,7 @@
                             <div class="form-group row">
                                 <label class="col-5 col-form-label">Expected Arrival Time</label>
                                 <div class="col-7">
-                                    <input type="text" name="estimated_arrival_time" class="form-control" placeholder="Estimated Arrival Time" id="date">
+                                    <input type="text" name="estimated_arrival_time" class="form-control" placeholder="Estimated Arrival Time" id="eta_date">
                                     <span style="font-size: 12px;" class="text-danger error-text estimated_arrival_time_error"></span>
                                 </div>
                             </div>

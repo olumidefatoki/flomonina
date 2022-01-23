@@ -39,12 +39,15 @@ class AggregatorController extends Controller
 
     public function getAggregatorList(Request $request)
     {
+       
         $aggregators = Aggregator::join('state', 'state.id', '=', 'aggregator.state_id')
-            ->join('bank', 'bank.id', '=', 'aggregator.bank_id')
-            ->orderBy('aggregator.id', 'desc')
-            ->get([
-                'aggregator.*', 'state.name AS state_name', 'bank.name As bank_name'
-            ]);
+            ->join('bank', 'bank.id', '=', 'aggregator.bank_id');
+            if (!is_null($request['name'])){
+                $aggregators->where('aggregator.name','=',$request['name']);
+              }
+        $aggregators->orderBy('aggregator.id', 'desc');
+        $aggregators->select('aggregator.*', 'state.name AS state_name', 'bank.name As bank_name');
+              
         return DataTables::of($aggregators)
             ->addIndexColumn()
             ->addColumn('actions', function ($row) {
