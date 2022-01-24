@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateDeliveryRequest;
+use App\Http\Requests\CreateWarehouseDeliveryRequest;
+use App\Http\Requests\CreateWarehouseRequest;
 use Exception;
 use Validator;
-use DataTables;
 use App\Models\Partner;
+use App\Models\Aggregator;
+use App\Models\Commodity;
 use App\Models\Delivery;
 use App\Models\Dispatch;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Rules\DecimalValidator;
 use App\Services\DeliveryService;
@@ -36,6 +40,18 @@ class DeliveryController extends Controller
             [
                 'dispatchs' => $dispatchs,
                 'processors' => Partner::where('type', 'PROCESSOR')->get(),
+            ]
+        );
+    }
+
+    public function warehouseIndex()
+    {
+        return view(
+            'delivery.warehouse.index',
+            [
+                'warehouses' => Warehouse::all(),
+                'aggregators' => Aggregator::all(),
+                'commodities' => Commodity::all(),
             ]
         );
     }
@@ -69,6 +85,14 @@ class DeliveryController extends Controller
     public function store(CreateDeliveryRequest $request, DeliveryService $service)
     {
         if ($service->create($request)) {
+            return response()->json(['status' => 1, 'msg' => 'Way Ticket has been successfully upload.']);
+        }
+        return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
+    }
+
+    public function warehouseStore(CreateWarehouseDeliveryRequest $request, DeliveryService $service)
+    {
+        if ($service->warehouseCreate($request)) {
             return response()->json(['status' => 1, 'msg' => 'Way Ticket has been successfully upload.']);
         }
         return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);

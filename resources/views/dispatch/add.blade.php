@@ -19,7 +19,7 @@
                                         @foreach ($trades as $trade)
                                         <option value="{{ $trade->id }}">
                                             {{ strtoupper($trade->partner->name) }} >>
-                                            {{ $trade->margin }}
+                                            {{ strtoupper($trade->description) }} 
                                         </option>
                                         @endforeach
                                     </select>

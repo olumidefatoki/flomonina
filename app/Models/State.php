@@ -10,4 +10,9 @@ class State extends Model
     use HasFactory;
     protected $table = 'state';
 
+    public function lga()
+    {
+        return $this->hasMany('App\Models\Lga');
+    }
+
 }

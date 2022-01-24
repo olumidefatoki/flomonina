@@ -35,7 +35,14 @@
                                         <option value="Direct sourcing">Direct sourcing</option>
                                     </select><span class="text-danger error-text type_error "></span>
                                 </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Description</label>
+                                <div class="col-7">
+                                    <input type="text" name="description" class="form-control" placeholder="Description" id="description">
+                                    <span class="text-danger error-text description_error"></span>
 
+                                </div>
                             </div>
                             <div class="form-group row" id="amount" style="display:none">
                                 <label class="col-5 col-form-label">Prefunded Amount</label>
@@ -87,16 +94,8 @@
                                 <label class="col-5 col-form-label">Date</label>
                                 <div class="col-7">
                                     <input type="text" name="date" class="form-control" placeholder="Date" id="date">
-                                </div>
-                                <span class="text-danger error-text date_error"></span>
-                            </div>
-                            <div class="form-group">
-                                <label>Date</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <input type="text" name="date" class="form-control" placeholder="Date" id="date">
-                                    </div>
-                                    <span style="font-size: 10px;" class="text-danger error-text date_error"></span>
+                                                               <span class="text-danger error-text date_error"></span>
+
                                 </div>
                             </div>
                             <div class="modal-footer">

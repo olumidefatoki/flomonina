@@ -10,4 +10,9 @@ class Warehouse extends Model
     use HasFactory;
 
     protected $table = 'warehouse';
+
+    public function lga()
+    {
+        return $this->belongsTo('App\Models\Lga');
+    }
 }

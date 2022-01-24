@@ -22,7 +22,7 @@
                     <ul aria-expanded="false" class="collapse">
                         <li><a href="{{ route('dispatch.index') }}"><i class="fas fa-truck"></i> Dispatch</a></li>
                         <li><a href="{{ route('delivery.index') }}"><i class="fas fa-upload"></i> Ticket Upload</a>
-                        <li><a href="{{ route('delivery.warehouse') }}"><i class="fas fa-upload"></i> Warehouse </a>
+                        <li><a href="{{ route('delivery.warehouse.index') }}"><i class="fas fa-upload"></i> Warehouse </a>
 
                         </li>
                     </ul>
