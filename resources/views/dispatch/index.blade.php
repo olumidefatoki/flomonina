@@ -7,6 +7,9 @@
         href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}"
         rel="stylesheet">
 @endsection
+@section('link')
+<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+@endsection
 @section('content')
     <div class="container-fluid">
         <!-- ============================================================== -->

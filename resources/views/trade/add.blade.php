@@ -90,6 +90,15 @@
                                 </div>
                                 <span class="text-danger error-text date_error"></span>
                             </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group">
+                                        <input type="text" name="date" class="form-control" placeholder="Date" id="date">
+                                    </div>
+                                    <span style="font-size: 10px;" class="text-danger error-text date_error"></span>
+                                </div>
+                            </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success mr-2" id="btnSubmit">Create</button>
                                 <div id="loading" style="display:none"> <img src="{{ URL::to('assets/images/ajax-loader.gif') }}" alt="" /></div>
