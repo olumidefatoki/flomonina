@@ -12,6 +12,7 @@
                         id="create_delivery_form" enctype="multipart/form-data">
                         @csrf
                         <div class="form pt-s">
+                            <span class="text-danger error-text error_message "></span>
                             <div class="form-group row">
                                 <label class="col-5 col-form-label">Truck number</label>
                                 <div class="col-7">

@@ -60,6 +60,10 @@ class DeliveryController extends Controller
     {
         return $service->getAllDeliveries($request);
     }
+    public function getWareHouseDeliveryList(Request $request, DeliveryService $service)
+    {
+        return $service->getAllWarehouseDeliveries($request);
+    }
 
     public function getDeliveryDetails($id)
     {

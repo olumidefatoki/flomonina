@@ -26,6 +26,7 @@ class CreateWarehouseDeliveryRequest extends FormRequest
     public function rules()
     {
         return [
+            'number_of_bags' => 'required|numeric',
             'aggregator' => 'required|numeric',
             'commodity' => 'required|numeric',
             'warehouse' => 'required|numeric',

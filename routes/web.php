@@ -56,7 +56,7 @@ Route::get('/dispatch/details/{id}', [DispatchController::class, 'getDispatchDet
 Route::post('/dispatch/update', [DispatchController::class, 'update'])->name('dispatch-update');
 
 Route::get('/delivery/warehouse', [DeliveryController::class, 'warehouseIndex'])->name('delivery.warehouse.index');
-Route::get('/delivery/warehouse-list', [DeliveryController::class, 'index'])->name('delivery.warehouse.list');
+Route::get('/delivery/warehouse-list', [DeliveryController::class, 'getWareHouseDeliveryList'])->name('delivery.warehouse.list');
 Route::post('/delivery/warehouse', [DeliveryController::class, 'warehouseStore'])->name('delivery.warehouse.store');
 
 

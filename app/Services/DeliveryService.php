@@ -4,16 +4,11 @@ namespace App\Services;
 
 use Exception;
 use DataTables;
-use App\Models\State;
-use App\Models\Trade;
-use App\Models\Status;
 use App\Models\CodeGen;
 use App\Models\Partner;
 use App\Models\Delivery;
 use App\Models\Dispatch;
-use App\Models\Commodity;
-
-use App\Models\Aggregator;
+use App\Models\WarehouseDelivery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -68,15 +63,25 @@ class DeliveryService
 
     public function warehouseCreate($request)
     {
+
+        $codeGen = CodeGen::find(2);
+        $code = $codeGen->prefix . '/' .  $codeGen->next_num;
+        $data = array('next_num' => sprintf('%06d', $codeGen->next_num + 1));
+        DB::table('code_gen')->where('id', 2)->update($data);
+
         if (empty($request->date)) {
             $request->date = now();
         }
         $data = array(
+            'commodity_id' => $request->commodity,
+            'code' => $code,
             'warehouse_id' => $request->warehouse,
             'quantity' => $request->quantity,
             'aggregator_id' => $request->aggregator,
             'aggregator_price' => $request->aggregator_price,
             'partner_price' => $request->partner_price,
+            'truck_number' => $request->truck_number,
+            'number_of_bags' => $request->number_of_bags,
             'partner_id' => 1,
             'way_ticket_path' => 'upload/tickets/warehouse',
             'margin' => $request->partner_price - $request->aggregator_price,
@@ -170,36 +175,39 @@ class DeliveryService
 
     public function getAllWarehouseDeliveries($request)
     {
-        $deliveries = Delivery::join('dispatch', 'dispatch_id', '=', 'dispatch.id')
-            ->join('trade', 'trade.id', '=', 'dispatch.trade_id')
-            ->join('aggregator', 'aggregator.id', '=', 'dispatch.aggregator_id')
-            ->join('partner', 'partner.id', '=', 'trade.partner_id')
-            ->join('commodity', 'commodity.id', '=', 'dispatch.commodity_id')
-            ->join('status', 'status.id', '=', 'delivery.status_id');
+        $deliveries = WarehouseDelivery::join('warehouse', 'warehouse.id', '=', 'warehouse_delivery.warehouse_id')
+            ->join('state',  'state.id', '=', 'warehouse.state_id')
+            ->join('partner',  'partner.id', '=', 'warehouse_delivery.partner_id')
+            ->join('aggregator', 'aggregator.id', '=', 'warehouse_delivery.aggregator_id')
+            ->join('commodity', 'commodity.id', '=', 'warehouse_delivery.commodity_id')
+            ->join('users', 'users.id', '=', 'warehouse_delivery.created_by');
 
+
+        if (!is_null($request['commodity_id'])) {
+            $deliveries->where('warehouse_delivery.commodity_id', '=', $request['commodity_id']);
+        }
+        if (!is_null($request['aggregator_id'])) {
+            $deliveries->where('warehouse_delivery.aggregator_id', '=', $request['aggregator_id']);
+        }
         if (!is_null($request['code'])) {
-            $deliveries->where('dispatch.code', '=', $request['code']);
+            $deliveries->where('warehouse_delivery.code', '=', $request['code']);
         }
         if (!is_null($request['truck_number'])) {
-            $deliveries->where('dispatch.truck_number', '=', $request['truck_number']);
-        }
-        if (!is_null($request['partner_id'])) {
-            $deliveries->where('delivery.partner_id', '=', $request['partner_id']);
+            $deliveries->where('warehouse_delivery.truck_number', '=', $request['truck_number']);
         }
         if (!is_null($request['start_date']) && !is_null($request['end_date'])) {
             $startDate = $request['start_date'] . ' 00:00:00';
             $endDate   = $request['end_date'] . ' 23:59:59';
-            $deliveries->whereBetween('delivery.created_at', array($startDate, $endDate));
+            $deliveries->whereBetween('warehouse_delivery.created_at', array($startDate, $endDate));
         }
-        $deliveries->orderBy('delivery.created_at', 'desc');
+        $deliveries->orderBy('warehouse_delivery.created_at', 'desc');
         $deliveries->select(
-            'delivery.*',
-            'dispatch.truck_number',
+            'warehouse_delivery.*',
             'partner.name As partner',
-            'status.name As status',
-            'dispatch.code',
             'aggregator.name As aggregator',
-            'commodity.name As commodity'
+            'commodity.name As commodity',
+            'state.name As state',
+            'warehouse.name As warehouse'
         );
         return DataTables::of($deliveries)
             ->addIndexColumn()
@@ -210,12 +218,10 @@ class DeliveryService
                                                 <a href="/delivery/details/' . $row['id'] . '"> <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" >View</button> </a>
                                           </div>';
             })->rawColumns(['actions'])
-            ->editColumn('accepted_quantity', function ($item) {
-                return number_format($item->accepted_quantity);
+            ->editColumn('quantity', function ($item) {
+                return number_format($item->quantity);
             })->editColumn('aggregator_amount', function ($item) {
                 return number_format($item->aggregator_price * $item->accepted_quantity);
-            })->editColumn('discounted_amount', function ($item) {
-                return number_format($item->partner_price * $item->accepted_quantity);
             })->editColumn('created_at', function ($item) {
                 if (empty($item->created_at))
                     return $item->created_at;

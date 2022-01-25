@@ -12,17 +12,18 @@
                         id="create_delivery_warehouse_form" enctype="multipart/form-data">
                         @csrf
                         <div class="form pt-s">
+                            <span class="text-danger error-text error_message "></span>
                             <div class="form-group row">
                                 <label class="col-5 col-form-label">Thrive Warehouse</label>
                                 <div class="col-7">
                                     <select id="formGender" name="warehouse" class="form-control select">
                                         <option selected disabled>Select a warehouse</option>
-                                      @foreach ($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}">
-                                             {{ $warehouse->lga->state->name }}  >> 
-                                            {{ $warehouse->lga->name }} >>
-                                            {{ $warehouse->name }}
-                                        </option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">
+                                                {{ $warehouse->lga->state->name }} >>
+                                                {{ $warehouse->lga->name }} >>
+                                                {{ $warehouse->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     <span style="font-size: 10px;"
@@ -34,13 +35,14 @@
                                 <div class="col-7">
                                     <select id="formGender" name="aggregator" class="form-control select">
                                         <option selected disabled>Select a Aggregator</option>
-                                         @foreach ($aggregators as $aggregator)
-                                        <option value="{{ $aggregator->id }}">
-                                            {{ $aggregator->name }}
-                                        </option>
+                                        @foreach ($aggregators as $aggregator)
+                                            <option value="{{ $aggregator->id }}">
+                                                {{ $aggregator->name }}
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <span style="font-size: 10px;" class="text-danger error-text aggregator_error"></span>
+                                    <span style="font-size: 10px;"
+                                        class="text-danger error-text aggregator_error"></span>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -48,13 +50,14 @@
                                 <div class="col-7">
                                     <select id="formGender" name="commodity" class="form-control select">
                                         <option selected disabled>Select a Commodity</option>
-                                         @foreach ($commodities as $commodity)
-                                        <option value="{{ $commodity->id }}">
-                                            {{ $commodity->name }}
-                                        </option>
+                                        @foreach ($commodities as $commodity)
+                                            <option value="{{ $commodity->id }}">
+                                                {{ $commodity->name }}
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <span style="font-size: 10px;" class="text-danger error-text commodity_error"></span>
+                                    <span style="font-size: 10px;"
+                                        class="text-danger error-text commodity_error"></span>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -80,10 +83,28 @@
                             <div class="form-group row">
                                 <label class="col-5 col-form-label">Quantity</label>
                                 <div class="col-7">
-                                    <input type="text" class="form-control" name="quantity"
-                                        placeholder="Quantity Accepted">
+                                    <input type="text" class="form-control" name="quantity" placeholder="Quantity">
+                                    <span style="font-size: 10px;" class="text-danger error-text quantity_error"></span>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Number of Bags</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" name="number_of_bags"
+                                        placeholder="Number of Bags">
                                     <span style="font-size: 10px;"
-                                        class="text-danger error-text quantity_error"></span>
+                                        class="text-danger error-text number_of_bags_error"></span>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Truck Number</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" name="truck_number"
+                                        placeholder="Truck Number">
+                                    <span style="font-size: 10px;"
+                                        class="text-danger error-text truck_number_error"></span>
 
                                 </div>
                             </div>

@@ -39,23 +39,72 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <input type="text" class="form-control" name="code" id="code" placeholder="Code">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control" name="truck_number" id="truck_number"
+                                    placeholder="Truck Number">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="commodity" name="commodity" class="form-control select">
+                                    <option selected disabled>Select a Commodity</option>
+                                    @foreach ($commodities as $commodity)
+                                        <option value="{{ $commodity->id }}">
+                                            {{ $commodity->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="aggregator" name="aggregator" class="form-control select">
+                                    <option selected disabled>Select a Aggregator</option>
+                                    @foreach ($aggregators as $aggregator)
+                                        <option value="{{ $aggregator->id }}">
+                                            {{ $aggregator->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <input type="text" name="start-date" class="form-control" placeholder="Start Date"
+                                    id="start-date">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" name="end-date" class="form-control" placeholder="End Date"
+                                    id="end-date">
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-bg btn-success" id="btnFiterSubmitSearch"><i
+                                        class="fa fa-filter"></i>
+                                    Filter Search</button>
 
+                                <a href="{{ route('delivery.warehouse.index') }}">
+                                    <button class="btn btn-bg btn-success" id="searchfilter"><i class="fa fa-filter"></i>
+                                        Clear Filter</button>
+                                </a>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table id="delivery-warehouse-table" class="table m-t-30 table-hover no-wrap contact-list"
                                 data-paging="true" data-paging-size="7">
                                 <thead>
                                     <tr>
                                         <th>S/N</th>
+                                        <th>Code</th>
+                                        <th>State</th>
+                                        <th>WareHouse</th>
                                         <th>Partner</th>
                                         <th>Aggregator</th>
-                                        <th>Processor</th>
+                                        <th>Truck Number</th>
                                         <th>Commodity</th>
-                                        <th>Truck No</th>
-                                        <th nowrap>Accepted Quantity(kg)</th>
-                                        <th nowrap>Discounted Amount(&#8358;)</th>
-                                        <th nowrap>Aggregator Amount(&#8358;)</th>
-                                        <th>Status</th>
+                                        <th nowrap>Quantity(kg)</th>
+                                        <th nowrap>Partner Price</th>
+                                        <th nowrap>Aggregator Price</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
@@ -86,6 +135,112 @@
             time: false
         });
         $(function() {
+
+            var table = $('#delivery-warehouse-table').DataTable({
+                processing: true,
+                serverSide: true,
+                info: true,
+                ajax: {
+                    url: "{{ route('delivery.warehouse.list') }}",
+                    type: 'GET',
+                    data: function(d) {
+                        d.code = $('#code').val();
+                        d.truck_number = $('#truck_number').val();
+                        d.aggregator_id = $('#aggregator').val();
+                        d.commodity_id = $('#commodity').val();
+                        d.start_date = $('#start_date').val();
+                        d.end_date = $('#end_date').val();
+                    }
+                },
+                "pageLength": 50,
+                "aLengthMenu": [
+                    [25, 50, -1],
+                    [25, 50, "All"]
+                ],
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'code',
+                        name: 'code',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'state',
+                        name: 'state',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'warehouse',
+                        name: 'warehouse',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'partner',
+                        name: 'partner',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'aggregator',
+                        name: 'aggregator',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'truck_number',
+                        name: 'truck_number',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'commodity',
+                        name: 'commodity',
+                        orderable: false,
+                        searchable: false
+                    },
+
+                    {
+                        data: 'quantity',
+                        name: 'quantity',
+                        orderable: false,
+                        searchable: false
+                    },
+
+                    {
+                        data: 'partner_price',
+                        name: 'partner_price',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'aggregator_price',
+                        name: 'aggregator_price',
+                        orderable: false,
+                        searchable: false
+                    },
+
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+
             $("#create_delivery_warehouse_form").on('submit', function(e) {
                 e.preventDefault();
                 $("#btnSubmit").css('display', 'none');
@@ -107,10 +262,12 @@
                             $.each(data.error, function(prefix, val) {
                                 $('span.' + prefix + '_error').text(val[0]);
                             });
-                        } else {
-                            //$('#delivery-warehouse-table').DataTable().ajax.reload(null, false);
+                        } else if (data.status == 1) {
+                            $('#delivery-warehouse-table').DataTable().ajax.reload(null, false);
                             $('#create_delivery_warehouse_form')[0].reset();
                             $('#add-delivery-warehouse-modal').modal('hide');
+                        } else {
+                            $('span.error_message').text(data.msg);
                         }
                     }
                 });
@@ -155,7 +312,9 @@
             });
 
 
-
+            $('#btnFiterSubmitSearch').click(function() {
+                $('#delivery-warehouse-table').DataTable().draw(true);
+            });
 
             //Reset input file
             $('input[type="file"][name="way_ticket"]').val('');
@@ -185,6 +344,7 @@
                     $(img_holder).empty();
                 }
             });
+
 
         });
     </script>
