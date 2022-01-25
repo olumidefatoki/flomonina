@@ -72,11 +72,11 @@
                         <div class="form-group row">
                             <div class="col-3">
                                 <input type="text" name="start-date" class="form-control" placeholder="Start Date"
-                                    id="start-date">
+                                    id="start_date">
                             </div>
                             <div class="col-3">
                                 <input type="text" name="end-date" class="form-control" placeholder="End Date"
-                                    id="end-date">
+                                    id="end_date">
                             </div>
                             <div class="col-6">
                                 <button class="btn btn-bg btn-success" id="btnFiterSubmitSearch"><i
@@ -130,7 +130,11 @@
         src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
     </script>
     <script>
-        $('#date').bootstrapMaterialDatePicker({
+        $('#start_date').bootstrapMaterialDatePicker({
+            weekStart: 0,
+            time: false
+        });
+        $('#end_date').bootstrapMaterialDatePicker({
             weekStart: 0,
             time: false
         });
