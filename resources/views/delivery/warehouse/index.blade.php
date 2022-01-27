@@ -130,6 +130,10 @@
         src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
     </script>
     <script>
+    $('#date').bootstrapMaterialDatePicker({
+            weekStart: 0,
+            time: false
+        });
         $('#start_date').bootstrapMaterialDatePicker({
             weekStart: 0,
             time: false

@@ -11,6 +11,8 @@ use App\Http\Controllers\MarketController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\DashboardController;
+
 
 
 
@@ -34,6 +36,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/dashboardReport', [DashboardController::class, 'getReport'])->name('dashboardReport');
 Route::get('/aggregator-list', [AggregatorController::class, 'getAggregatorList'])->name('aggregator.list');
 Route::get('/aggregator/edit/{id}', [AggregatorController::class, 'edit'])->name('aggregator.edit');
 Route::post('/aggregator/update', [AggregatorController::class, 'update'])->name('aggregator-update');
