@@ -170,7 +170,12 @@ class DeliveryService
             'status_id' => 3,
             'updated_by' => Auth::id(),
         );
-        return  DB::table('dispatch')->where('id', $request->id)->update($data);
+        try {
+            $return = DB::table('delivery')->where('id', $request->id)->update($data);
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage());
+            throw new HttpResponseException(response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']));
+        }
     }
 
     public function getAllWarehouseDeliveries($request)
@@ -213,9 +218,7 @@ class DeliveryService
             ->addIndexColumn()
             ->addColumn('actions', function ($row) {
                 return '<div class="btn-group">
-                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editDeliveryBtn">Edit</button>  
-                                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                                <a href="/delivery/details/' . $row['id'] . '"> <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" >View</button> </a>
+                                                <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editWarehouseDeliveryBtn">Edit</button>  
                                           </div>';
             })->rawColumns(['actions'])
             ->editColumn('quantity', function ($item) {
@@ -228,5 +231,28 @@ class DeliveryService
                 return date('Y-m-d H:i:s', strtotime($item->created_at));
             })
             ->make(true);
+    }
+
+    public function warehouseUpdate($request)
+    {
+        
+        $data = array(
+            'commodity_id' => $request->commodity,
+            'warehouse_id' => $request->warehouse,
+            'quantity' => $request->quantity,
+            'aggregator_id' => $request->aggregator,
+            'aggregator_price' => $request->aggregator_price,
+            'partner_price' => $request->partner_price,
+            'truck_number' => $request->truck_number,
+            'number_of_bags' => $request->number_of_bags,
+            'way_ticket_path' => 'upload/tickets/warehouse',
+            'margin' => $request->partner_price - $request->aggregator_price,
+        );
+        try {
+            return $return = DB::table('warehouse_delivery')->where('id', $request->id)->update($data);
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage());
+            throw new HttpResponseException(response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']));
+        }
     }
 }

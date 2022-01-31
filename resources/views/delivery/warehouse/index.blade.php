@@ -112,6 +112,7 @@
                                 <tbody></tbody>
                                 <tfoot>
                                     @include('delivery.warehouse.add')
+                                    @include('delivery.warehouse.edit')
                                 </tfoot>
                             </table>
                         </div>
@@ -130,7 +131,7 @@
         src="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}">
     </script>
     <script>
-    $('#date').bootstrapMaterialDatePicker({
+        $('#date').bootstrapMaterialDatePicker({
             weekStart: 0,
             time: false
         });
@@ -286,7 +287,26 @@
                 $('#add-delivery-warehouse-modal').modal('show');
             });
 
-            $("#update_delivery_warehouse_form").on('submit', function(e) {
+            $(document).on('click', '#editWarehouseDeliveryBtn', function() {
+                $('#update_warehouse_delivery_form')[0].reset();
+                $('#edit-warehouse-delivery-modal').modal('show');
+                var id = $(this).data('id');
+                $.get("{{ url('/delivery/warehouse/edit/') }}" + '/' + id, function(data) {
+                    console.log(data.details);
+                    $('input[name="id"]').val(data.details.id);
+                    $('input[name="partner_price"]').val(data.details.partner_price);
+                    $('input[name="aggregator_price"]').val(data.details.aggregator_price);
+                    $('input[name="quantity"]').val(data.details.quantity);
+                    $('input[name="truck_number"]').val(data.details.truck_number);
+                    $('input[name="number_of_bags"]').val(data.details.number_of_bags);
+                    $('select[name="commodity"]').val(data.details.commodity_id);
+                    $('select[name="aggregator"]').val(data.details.aggregator_id);
+                    $('select[name="warehouse"]').val(data.details.warehouse_id);
+                }, 'json');
+            });
+
+
+            $("#update_warehouse_delivery_form").on('submit', function(e) {
                 e.preventDefault();
                 $("#btnUpdate").css('display', 'none');
                 $("#loadingUpdate").css('display', 'inline');
@@ -304,9 +324,9 @@
                         $("#loadingUpdate").css('display', 'none');
                         $("#btnUpdate").css('display', 'inline');
                         if (data.status == 1) {
-                            $('#delivery-table').DataTable().ajax.reload(null, false);
-                            $('#update_delivery_form')[0].reset();
-                            $('#edit-delivery-modal').modal('hide');
+                            $('#delivery-warehouse-table').DataTable().ajax.reload(null, false);
+                            $('#update_warehouse_delivery_form')[0].reset();
+                            $('#edit-warehouse-delivery-modal').modal('hide');
                             toastr.success(data.msg);
                         } else if (data.status == 0) {
                             $.each(data.error, function(prefix, val) {

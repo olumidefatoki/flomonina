@@ -69,7 +69,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-center">No Of Commodity</h5>
                         <div class="text-center">
-                            <h3>4</h3>
+                            <h3>5</h3>
                         </div>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
             <div class="col-lg-2">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title text-uppercase text-center">ToTal MT Supplied to FP</h5>
+                        <h5 class="card-title text-uppercase text-center">ToTal Volume Supplied to FP</h5>
                         <div class="text-center">
                             <h3 id="total_volume_fp">20</h3>
                         </div>
@@ -110,7 +110,7 @@
             <div class="col-lg-2">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title text-uppercase text-center">ToTal MT Supplied to WH</h5>
+                        <h5 class="card-title text-uppercase text-center">ToTal Volume Supplied to WH</h5>
                         <div class="text-center">
                             <h3 id="total_volume_wh">20</h3>
                         </div>
@@ -120,10 +120,9 @@
             <div class="col-lg-2">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title text-uppercase text-center">ToTal MT Supplied </h5>
+                        <h5 class="card-title text-uppercase text-center">ToTal Volume Supplied </h5>
                         <div class="text-center">
-                            </br>
-                            <h3 id="total_volume">5</h3>
+                            <h3 id="total_volume_all">5</h3>
                         </div>
                     </div>
                 </div>
@@ -133,7 +132,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-center">ToTal value Supplied to FP</h5>
                         <div class="text-center">
-                            <h3 id ="total_value_fp">4</h3>
+                            <h3 id="total_value_fp">4</h3>
                         </div>
                     </div>
                 </div>
@@ -153,7 +152,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-center">ToTal value Supplied</h5>
                         <div class="text-center">
-                            <h3>4</h3>
+                            <h3 id="total_value_all">4</h3>
                         </div>
                     </div>
                 </div>
@@ -230,21 +229,27 @@
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
-                    console.log(data);
+                    //console.log(data);
                     $.each(data.generic, function(i, dat) {
-                        
+                        var total_volume_all = parseInt(dat.total_volume_fp) + parseInt(dat
+                            .total_volume_wh);
+                        var total_value_all = parseInt(dat.total_value_fp) + parseInt(dat
+                            .total_value_wh);
                         $('#total_processor').html(dat.total_processor);
                         $('#total_aggregator').html(dat.total_aggregator);
                         $('#total_warehouse').html(dat.total_warehouse);
                         $('#total_revenue_fp').html('&#8358;' + dat.total_revenue_fp);
                         $('#total_revenue_wh').html('&#8358;' + dat.total_revenue_wh);
-                        $('#total_volume_fp').html(dat.total_volume_fp + 'MT');
-                        $('#total_volume_wh').html(dat.total_volume_wh + 'MT');
-                        $('#total_volume').html(dat.total_volume_wh);
-$('#total_value_fp').html('&#8358;' + dat.total_value_fp);
-$('#total_value_wh').html('&#8358;' + dat.total_value_wh);
-$('#total_volume').html(dat.total_volume_wh);
-
+                        $('#total_volume_fp').html(parseInt(dat.total_volume_fp)
+                        .toLocaleString() + 'MT');
+                        $('#total_volume_wh').html(parseInt(dat.total_volume_wh)
+                        .toLocaleString() + 'MT');
+                        $('#total_volume_all').html(total_volume_all.toLocaleString() + 'MT');
+                        $('#total_value_fp').html('&#8358;' + (parseInt(dat.total_value_fp)
+                            .toLocaleString()));
+                        $('#total_value_wh').html('&#8358;' + parseInt(dat.total_value_wh)
+                            .toLocaleString());
+                        $('#total_value_all').html('&#8358;' + total_value_all.toLocaleString());
 
                     });
                     if (typeof Morris != 'undefined') {
@@ -289,7 +294,6 @@ $('#total_volume').html(dat.total_volume_wh);
                     data.addColumn('string', 'state');
                     data.addColumn('number', '');
                     $.each(jsonData, function(i, jsonData) {
-                        console.log(jsonData);
                         var value = parseInt(jsonData.value);
                         var name = jsonData.commodity;
                         data.addRows([
@@ -324,7 +328,6 @@ $('#total_volume').html(dat.total_volume_wh);
                         geoData.addColumn('number', 'No Of Warehouse');
                         geoData.addColumn('string', 'Code');
                         $.each(jsonData, function(i, jsonData) {
-                            console.log(jsonData);
                             var value = parseInt(jsonData.value);
                             var name = jsonData.name;
                             var cCode = jsonData.code;

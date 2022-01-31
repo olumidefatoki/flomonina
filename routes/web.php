@@ -62,6 +62,8 @@ Route::post('/dispatch/update', [DispatchController::class, 'update'])->name('di
 Route::get('/delivery/warehouse', [DeliveryController::class, 'warehouseIndex'])->name('delivery.warehouse.index');
 Route::get('/delivery/warehouse-list', [DeliveryController::class, 'getWareHouseDeliveryList'])->name('delivery.warehouse.list');
 Route::post('/delivery/warehouse', [DeliveryController::class, 'warehouseStore'])->name('delivery.warehouse.store');
+Route::get('/delivery/warehouse/edit/{id}', [DeliveryController::class, 'editWareHouseDelivery'])->name('delivery.warehouse.edit');
+Route::post('/delivery/warehouse/update', [DeliveryController::class, 'updateWarehouseDelivery'])->name('delivery.warehouse.update');
 
 
 Route::resource('delivery', DeliveryController::class);
