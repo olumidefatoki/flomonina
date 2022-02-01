@@ -37,7 +37,6 @@ class DeliveryService
 
         $data = array(
             'dispatch_id' => $request->dispatch,
-            'commodity_id' => $request->commodity,
             'accepted_quantity' => $request->accepted_quantity,
             'aggregator_price' => $request->aggregator_price,
             'discounted_price' => $request->discounted_price,
