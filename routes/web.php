@@ -32,6 +32,9 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return view('index');
 });
+Route::get('/404', function () {
+    return view('404');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
