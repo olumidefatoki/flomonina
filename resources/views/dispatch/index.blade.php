@@ -156,11 +156,7 @@
             weekStart: 0,
             time: false
         });
-        $('#start-date').bootstrapMaterialDatePicker({
-            weekStart: 0,
-            time: false
-        });
-        $('#end-date').bootstrapMaterialDatePicker({
+        $('#dispatch_time').bootstrapMaterialDatePicker({
             weekStart: 0,
             time: false
         });

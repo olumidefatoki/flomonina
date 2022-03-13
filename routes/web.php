@@ -85,6 +85,8 @@ Route::resource('pricing', PricingController::class);
 
 Route::get('/inventory/purchase', [InventoryController::class, 'purcharseIndex'])->name('purchase.index');
 Route::get('/inventory/supply', [InventoryController::class, 'supplyIndex'])->name('supply.index');
+Route::post('/inventory/supply', [InventoryController::class, 'purcharseStore'])->name('inventory.supply.store');
+
 
 Route::get('/warehouse/flomuvina', [WarehouseController::class, 'flomuvinaIndex'])->name('warehouse.flomuvina.index');
 Route::get('/warehouse/thrive', [WarehouseController::class, 'thriveIndex'])->name('warehouse.thrive.index');

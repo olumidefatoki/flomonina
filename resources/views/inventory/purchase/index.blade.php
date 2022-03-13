@@ -58,7 +58,7 @@
                                 </thead>
                                 <tbody></tbody>
                                 <tfoot></tfoot>
-                                @include('pricing.add')
+                                @include('inventory.purchase.add')
 
                             </table>
                         </div>
@@ -78,6 +78,10 @@
     </script>
 
     <script>
+     $('#date').bootstrapMaterialDatePicker({
+            weekStart: 0,
+            time: false
+        });
         $(function() {
             $("#create_trade_form").on('submit', function(e) {
                 e.preventDefault();

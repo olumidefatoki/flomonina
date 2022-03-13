@@ -157,20 +157,18 @@
                                 <label class="col-5 col-form-label">Dispatch Time</label>
                                 <div class="col-7">
                                     <input type="text" name="dispatch_time" class="form-control"
-                                        placeholder="dispatch_time" id="date">
+                                        placeholder="dispatch_time" id="dispatch_time">
                                     <span style="font-size: 12px;"
                                         class="text-danger error-text dispatch_time_error"></span>
 
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Date</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group">
-                                        <input type="text" name="date" class="form-control" placeholder="Date"
-                                            id="date">
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Date</label>
+                                <div class="col-7">
+                                    <input type="text" name="date" class="form-control" placeholder="Date" id="date">
                                     <span style="font-size: 10px;" class="text-danger error-text date_error"></span>
+
                                 </div>
                             </div>
                         </div>

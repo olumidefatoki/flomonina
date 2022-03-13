@@ -8,35 +8,26 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" method="post" action="{{ route('trade.store') }}"
+                    <form class="form-horizontal" method="post" action="{{ route('inventory.supply.store') }}"
                         id="create_trade_form">
                         @csrf
                         <div class="form pt-3">
                             <span class="text-danger error-text error_message "></span>
                             <div class="form-group row">
-                                <span class="text-danger error-text"></span>
-                                <label class="col-5 col-form-label">State</label>
+                                <label class="col-5 col-form-label">Thrive Warehouse</label>
                                 <div class="col-7">
-                                    <select id="formGender" name="partner" class="form-control select">
-                                        <option selected disabled>Select a state </option>
-                                    </select><span class="text-danger error-text partner_error "></span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-5 col-form-label">Lga</label>
-                                <div class="col-7">
-                                    <select id="trade_type" name="type" class="form-control select">
-                                        <option selected disabled>Select a lga</option>
-                                    </select><span class="text-danger error-text type_error "></span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <span class="text-danger error-text"></span>
-                                <label class="col-5 col-form-label">Market</label>
-                                <div class="col-7">
-                                    <select id="formGender" name="partner" class="form-control select">
-                                        <option selected disabled>Select a market </option>
-                                    </select><span class="text-danger error-text partner_error "></span>
+                                    <select id="formGender" name="warehouse" class="form-control select">
+                                        <option selected disabled>Select a warehouse</option>
+                                         @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">
+                                                {{ $warehouse->lga->state->name }} >>
+                                                {{ $warehouse->lga->name }} >>
+                                                {{ $warehouse->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <span style="font-size: 10px;"
+                                        class="text-danger error-text warehouse_error"></span>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -44,17 +35,56 @@
                                 <div class="col-7">
                                     <select id="trade_type" name="type" class="form-control select">
                                         <option selected disabled>Select a commodity</option>
+                                        @foreach ($commodities as $commodity)
+                                            <option value="{{ $commodity->id }}">
+                                           {{ $commodity->name }}
+                                            </option>
+                                        @endforeach
                                     </select><span class="text-danger error-text type_error "></span>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-5 col-form-label">Price</label>
+                                <label class="col-5 col-form-label">Quantity</label>
                                 <div class="col-7">
                                     <input type="text" name="start_date" class="form-control"
                                         placeholder="Warehouse Name">
                                     <span class="text-danger error-text start_date_error"></span>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Average Weight</label>
+                                <div class="col-7">
+                                    <input type="text" name="start_date" class="form-control"
+                                        placeholder="Warehouse Name">
+                                    <span class="text-danger error-text start_date_error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Unit Price</label>
+                                <div class="col-7">
+                                    <input type="text" name="start_date" class="form-control"
+                                        placeholder="Warehouse Name">
+                                    <span class="text-danger error-text start_date_error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label">Amount</label>
+                                <div class="col-7">
+                                    <input type="text" name="start_date" class="form-control"
+                                        placeholder="Warehouse Name">
+                                    <span class="text-danger error-text start_date_error"></span>
+                                </div>
+                            </div>
+
+                             <div class="form-group row">
+                                <label class="col-5 col-form-label">Date</label>
+                                <div class="col-7">
+                                    <input type="text" name="date" class="form-control" placeholder="Date" id="date">
+                                    <span style="font-size: 10px;" class="text-danger error-text date_error"></span>
+
+                                </div>
+                            </div>
+                            
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success mr-2" id="btnSubmit">Create</button>
                                 <div id="loading" style="display:none"> <img

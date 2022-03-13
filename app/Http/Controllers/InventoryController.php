@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Commodity;
+use App\Models\Warehouse;
+use App\Models\Aggregator;
 use Illuminate\Http\Request;
+use App\Services\DeliveryService;
+use App\Services\InventoryService;
+use App\Http\Requests\CreatePurcharseRequest;
 
 class InventoryController extends Controller
 {
@@ -17,12 +23,17 @@ class InventoryController extends Controller
      */
     public function index()
     {
-        return view('pricing.index');
     }
 
     public function purcharseIndex()
     {
-        return view('inventory.purchase.index');
+        return view(
+            'inventory.purchase.index',
+            [
+                'warehouses' => Warehouse::where('type','FLOMUVINA')->get(),
+                'commodities' => Commodity::all(),
+            ]
+        );
     }
 
     public function supplyIndex()
@@ -46,7 +57,11 @@ class InventoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function purcharseStore(CreatePurcharseRequest $request, InventoryService $service)
+    {
+        $service->createPurcharse($request);
+    }
+    public function supplyStore(Request $request)
     {
         //
     }

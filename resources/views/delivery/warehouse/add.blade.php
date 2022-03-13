@@ -46,6 +46,14 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label class="col-5 col-form-label">Ticket Number</label>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" name="ticket_number" placeholder="Ticket Number">
+                                    <span style="font-size: 10px;" class="text-danger error-text ticket_number_error"></span>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label class="col-5 col-form-label">Commodity</label>
                                 <div class="col-7">
                                     <select id="formGender" name="commodity" class="form-control select">

@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\DecimalValidator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CreateDispatchRequest extends FormRequest
+class CreatePurcharseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,16 +26,13 @@ class CreateDispatchRequest extends FormRequest
     public function rules()
     {
         return [
-            'trade' => 'required|numeric',
-            'aggregator' => 'required|numeric',
-            'number_of_bags' => 'required|numeric',
-            'truck_number' => 'required|max:10',
-            //'driver_name' => 'required|max:255',
-           //'driver_phone_number' => 'required|digits:11',
-            'pickup_state' => 'required|numeric',
-            'destination_state' => 'required|numeric',
-            'commodity' => 'required|numeric',
-            'estimated_arrival_time' => 'required|date_format:Y-m-d',
+            'dispatch' => 'required|numeric',
+            'processor' => 'required|numeric',
+            'accepted_quantity' => ['required', new DecimalValidator()],
+            'aggregator_price' => ['required', new DecimalValidator()],
+            'discounted_price' => ['required', new DecimalValidator()],
+            'processor_price' => ['required', new DecimalValidator()],
+            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
         ];
     }
 

@@ -7,52 +7,33 @@ use DataTables;
 use App\Models\CodeGen;
 use App\Models\Partner;
 use App\Models\Delivery;
-use App\Models\Dispatch;
 use App\Models\WarehouseDelivery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DeliveryService
+class InventoryService
 {
 
-
-    public function create($request)
+    public function createPurcharse($request)
     {
-        $trade = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
-            ->join('aggregator', 'dispatch.aggregator_id', '=', 'aggregator.id')
-            ->join('partner', 'trade.partner_id', '=', 'partner.id')
-            ->where('dispatch.id', '=', $request->dispatch)
-            ->get(['aggregator.name As aggregator', 'partner.name As partner'])
-            ->first();
-        $path = 'upload/tickets/food_processor';
-        $file = $request->file('way_ticket');
-        $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
-        $upload = $file->move($path, $file_name);
-
         if (empty($request->date)) {
             $request->date = now();
         }
-
         $data = array(
-            'dispatch_id' => $request->dispatch,
-            'accepted_quantity' => $request->accepted_quantity,
-            'aggregator_price' => $request->aggregator_price,
-            'discounted_price' => $request->discounted_price,
-            'trade_price' => $request->processor_price,
-            'processor' => Partner::find($request->processor)->name,
-            'partner_id' => $request->processor,
-            'way_ticket' => $upload,
-            'margin' => $request->processor_price - $request->aggregator_price,
-            'status_id' => 8,
+            'warehouse_id' => $request->warehouse,
+            'commodity_id' => $request->commodity,
+            'quantity' => $request->quantity,
+            'number_of_bags' => $request->number_of_bags,
+            'unit_price' => $request->unit_price,
+            'amount' => $request->amount,
             'created_at' => $request->date,
             'created_by' => Auth::id()
         );
         try {
-            $result = DB::table('delivery')->insert($data);
-            $dispatch = array('status_id' => 5);
-            DB::table('dispatch')->where('id', $request->dispatch)->update($dispatch);
+            $result = DB::table('purcharse')->insert($data);
+
             return $result;
         } catch (Exception $ex) {
             Log::error($ex->getMessage());

@@ -95,6 +95,7 @@
                                 <thead>
                                     <tr>
                                         <th>S/N</th>
+                                        <th>Ticket Number</th>
                                         <th>Code</th>
                                         <th>State</th>
                                         <th>WareHouse</th>
@@ -169,6 +170,12 @@
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'ticket_number',
+                        name: 'ticket_number',
                         orderable: false,
                         searchable: false
                     },
