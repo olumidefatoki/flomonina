@@ -188,9 +188,9 @@
                                 $('input[name="partner_price"]').val(data.details.partner_price);
                                 $('input[name="aggregator_price"]').val(data.details.aggregator_price);
                                 $('input[name="accepted_quantity"]').val(data.details.accepted_quantity);
-                                $('select[name="dispatch"]').val(data.details.dispatch_id);
+                                $('input[name="dispatch"]').val(data.details.truck_number);
                                 $('select[name="processor"]').val(data.details.partner_id);
-
+                                $('input[name="date"]').val(data.details.created_at.substring(0, 10));
                             }, 'json');
                         });
 

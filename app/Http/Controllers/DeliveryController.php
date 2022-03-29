@@ -122,7 +122,11 @@ class DeliveryController extends Controller
      */
     public function edit($id)
     {
-        $deliveries = Delivery::find($id);
+        //$deliveries = Delivery::find($id);
+        $deliveries = Delivery::join('dispatch', 'delivery.dispatch_id', '=', 'dispatch.id')
+            ->where('delivery.id', '=', $id)
+            ->select('delivery.*', 'dispatch.truck_number')
+            ->first();
         return response()->json(['details' => $deliveries]);
     }
 
@@ -142,17 +146,14 @@ class DeliveryController extends Controller
     public function update(UpdateDeliveryRequest $request, DeliveryService $service)
     {
 
-        if ($service->update($request)) {
-            return response()->json(['status' => 1, 'msg' => 'Delivery has been successfully updated.']);
-        }
-        return response()->json(['status' => 2, 'msg' => 'Something went wrong. Kindly contact the Admin.']);
+        $service->update($request);
+        return response()->json(['status' => 1, 'msg' => 'Delivery has been successfully updated.']);
     }
 
     public function updateWarehouseDelivery(CreateWarehouseDeliveryRequest $request, DeliveryService $service)
     {
-            $service->warehouseUpdate($request);
-            return response()->json(['status' => 1, 'msg' => 'Delivery has been successfully updated.']);
-       
+        $service->warehouseUpdate($request);
+        return response()->json(['status' => 1, 'msg' => 'Delivery has been successfully updated.']);
     }
 
     /**

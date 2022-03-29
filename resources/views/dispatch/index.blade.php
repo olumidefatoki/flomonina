@@ -208,7 +208,7 @@
                     console.log(data);
                     $('input[name="id"]').val(data.details.id);
                     $('input[name="estimated_arrival_time"]').val(data.details
-                        .estimated_arrival_time);
+                        .estimated_arrival_time.substring(0, 10));
                     $('input[name="driver_phone_number"]').val(data.details.driver_number);
                     $('input[name="driver_name"]').val(data.details.driver_name);
                     $('input[name="truck_number"]').val(data.details.truck_number);
@@ -219,7 +219,7 @@
                     $('select[name="commodity"]').val(data.details.commodity_id);
                     $('input[name="number_of_bags"]').val(data.details.number_of_bags);
                     $('input[name="logistics_company"]').val(data.details.logistics_company);
-                    $('input[name="dispatch_time"]').val(data.details.dispatch_time);
+                    $('input[name="dispatch_time"]').val(data.details.dispatch_time.substring(0, 10));
 
                 }, 'json');
             });

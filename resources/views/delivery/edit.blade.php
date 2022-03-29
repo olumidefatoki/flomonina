@@ -15,14 +15,8 @@
                             <div class="form-group row">
                                 <label class="col-5 col-form-label">Truck number</label>
                                 <div class="col-7">
-                                    <select id="formGender" name="dispatch" class="form-control select">
-                                        <option selected disabled>Select a Truck number</option>
-                                        @foreach ($dispatchs as $dispatch)
-                                        <option value="{{ $dispatch->id }}">
-                                            {{ ( $dispatch->truck_number) }}
-                                        </option>
-                                        @endforeach
-                                    </select>
+                                 <input type="text" class="form-control" name="dispatch" placeholder="Processor Price" disabled>
+
                                     <span style="font-size: 10px;" class="text-danger error-text dispatch_error "></span>
 
                                 </div>
@@ -91,7 +85,6 @@
                                 <div class="col-7">
                                     <input type="text" name="date" class="form-control" placeholder="Date" id="date">
                                     <span style="font-size: 10px;" class="text-danger error-text date_error"></span>
-
                                 </div>
                             </div>
                         </div>

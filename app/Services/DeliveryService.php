@@ -26,10 +26,16 @@ class DeliveryService
             ->where('dispatch.id', '=', $request->dispatch)
             ->get(['aggregator.name As aggregator', 'partner.name As partner'])
             ->first();
-        $path = 'upload/tickets/food_processor';
+
         $file = $request->file('way_ticket');
-        $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
-        $upload = $file->move($path, $file_name);
+        $path = 'upload/tickets/food_processor';
+        if (!empty($file)) {
+            $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
+            $upload = $file->move($path, $file_name);
+        } else {
+            $upload =  $path;
+        }
+
 
         if (empty($request->date)) {
             $request->date = now();
@@ -154,21 +160,35 @@ class DeliveryService
 
     public function update($request)
     {
+        
+        $trade = Dispatch::join('trade', 'trade_id', '=', 'trade.id')
+        ->join('aggregator', 'dispatch.aggregator_id', '=', 'aggregator.id')
+        ->join('partner', 'trade.partner_id', '=', 'partner.id')
+        ->join('delivery', 'delivery.dispatch_id', '=', 'dispatch.id')
+        ->where('delivery.id', '=', $request->id)
+        ->get(['aggregator.name As aggregator', 'partner.name As partner'])
+        ->first();
+        
+        $file = $request->file('way_ticket');
+        $path = 'upload/tickets/food_processor';
+        if (!empty($file)) {
+            $file_name = $trade->partner . '_' . $trade->aggregator . '_' . date('YmdHis') .  '.' . $file->extension();
+            $upload = $file->move($path, $file_name);
+        } else {
+            $upload =  $path;
+        }
+
         $data = array(
-            'trade_id' => $request->trade,
-            'aggregator_id' => $request->aggregator,
-            'number_of_bags' => $request->number_of_bags,
-            'truck_number' => $request->truck_number,
-            'driver_name' => $request->driver_name,
-            'driver_number' => $request->driver_phone_number,
-            'pickup_state_id' => $request->pickup_state,
-            'destination_state_id' => $request->destination_state,
-            'commodity_id' => $request->commodity,
-            'dispatch_time' => $request->dispatch_time,
-            'estimated_arrival_time' => $request->estimated_arrival_time,
-            'logistics_company' => $request->logistics_company,
-            'status_id' => 3,
-            'updated_by' => Auth::id(),
+            'accepted_quantity' => $request->accepted_quantity,
+            'aggregator_price' => $request->aggregator_price,
+            'discounted_price' => $request->discounted_price,
+            'trade_price' => $request->processor_price,
+            'processor' => Partner::find($request->processor)->name,
+            'partner_id' => $request->processor,
+            'way_ticket' => $upload,
+            'margin' => $request->processor_price - $request->aggregator_price,
+            'updated_at' => now(),
+            'created_by' => Auth::id()
         );
         try {
             $return = DB::table('delivery')->where('id', $request->id)->update($data);
@@ -235,7 +255,7 @@ class DeliveryService
 
     public function warehouseUpdate($request)
     {
-        
+
         $data = array(
             'commodity_id' => $request->commodity,
             'warehouse_id' => $request->warehouse,

@@ -32,7 +32,7 @@ class CreateDeliveryRequest extends FormRequest
             'aggregator_price' => ['required', new DecimalValidator()],
             'discounted_price' => ['required', new DecimalValidator()],
             'processor_price' => ['required', new DecimalValidator()],
-            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
+            //'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
         ];
     }
 

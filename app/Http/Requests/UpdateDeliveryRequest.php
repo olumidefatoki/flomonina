@@ -26,14 +26,14 @@ class UpdateDeliveryRequest extends FormRequest
     public function rules()
     {
         return [
-            'dispatch' => 'required|numeric',
+           // 'dispatch' => 'required|numeric',
             'processor' => 'required|numeric',
             'accepted_quantity' => ['required', new DecimalValidator()],
-            'no_of_bags_rejected' => 'required|numeric',
+            //'no_of_bags_rejected' => 'required|numeric',
             'aggregator_price' => ['required', new DecimalValidator()],
             'discounted_price' => ['required', new DecimalValidator()],
             'processor_price' => ['required', new DecimalValidator()],
-            'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
+            //'way_ticket' => 'required|image|mimes:jpeg,png,jpg,gif|max:1048',
         ];
     }
 
