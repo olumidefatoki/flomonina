@@ -8,7 +8,9 @@
         rel="stylesheet">
 @endsection
 @section('link')
-<link href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+    <link
+        href="{{ URL::to('assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}"
+        rel="stylesheet">
 @endsection
 @section('content')
     <div class="container-fluid">
@@ -81,7 +83,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                          
+
                             <div class="col-2">
                                 <input type="text" name="start-date" class="form-control" placeholder="Start Date"
                                     id="start-date">
@@ -122,6 +124,7 @@
                                         <th>Status</th>
                                         <th>Expected Arrivial Date</th>
                                         <th>Dispach Date</th>
+                                        <th>Uploaded Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -219,7 +222,8 @@
                     $('select[name="commodity"]').val(data.details.commodity_id);
                     $('input[name="number_of_bags"]').val(data.details.number_of_bags);
                     $('input[name="logistics_company"]').val(data.details.logistics_company);
-                    $('input[name="dispatch_time"]').val(data.details.dispatch_time.substring(0, 10));
+                    $('input[name="dispatch_time"]').val(data.details.dispatch_time.substring(0,
+                        10));
 
                 }, 'json');
             });
@@ -322,6 +326,12 @@
                     {
                         data: 'estimated_arrival_time',
                         name: 'estimated_arrival_time',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'dispatch_time',
+                        name: 'dispatch_time',
                         orderable: false,
                         searchable: false
                     },
