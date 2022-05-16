@@ -123,10 +123,12 @@ class DeliveryController extends Controller
     public function edit($id)
     {
         //$deliveries = Delivery::find($id);
+        DB::enableQueryLog();
         $deliveries = Delivery::join('dispatch', 'delivery.dispatch_id', '=', 'dispatch.id')
             ->where('delivery.id', '=', $id)
             ->select('delivery.*', 'dispatch.truck_number')
             ->first();
+           // dd(DB::getQueryLog());
         return response()->json(['details' => $deliveries]);
     }
 

@@ -80,7 +80,7 @@ class DispatchService
             $endDate   = $request['end_date'] . ' 23:59:59';
             $dispatchs->whereBetween('dispatch.created_at', array($startDate, $endDate));
         }
-        $dispatchs->orderBy('dispatch.created_at', 'desc');
+        $dispatchs->orderBy('dispatch.uploaded_at', 'desc');
         $dispatchs->select(
             'dispatch.*',
             'partner.name As partner',
@@ -99,12 +99,14 @@ class DispatchService
                                                 <button class="btn btn-sm btn-info" data-id="' . $row['id'] . '" id="editDispatchBtn">Edit</button> 
                                           </div>';
             })->editColumn('created_at', function ($item) {
-                if (empty($item->created_at))
-                    return $item->created_at;
-                return date('Y-m-d H:i:s', strtotime($item->created_at));
+                
+                return date('Y-m-d H:m:s', strtotime($item->created_at));
             })->editColumn('estimated_arrival_time', function ($item) {
                 return date('Y-m-d', strtotime($item->estimated_arrival_time));
-            })->editColumn('number_of_bags', function ($item) {
+            })->editColumn('dispatch_time', function ($item) {
+                return date('Y-m-d', strtotime($item->dispatch_time));
+            })
+            ->editColumn('number_of_bags', function ($item) {
                 return number_format($item->number_of_bags);
             })->rawColumns(['actions'])
             ->make(true);

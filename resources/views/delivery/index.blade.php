@@ -99,7 +99,8 @@
                                         <th nowrap>Discounted Amount(&#8358;)</th>
                                         <th nowrap>Aggregator Amount(&#8358;)</th>
                                         <th>Status</th>
-                                        <th>Date</th>
+                                        <th>Transaction Date</th>
+                                        <th>Uploaded Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -319,6 +320,12 @@
                                 {
                                     data: 'created_at',
                                     name: 'created_at',
+                                    orderable: false,
+                                    searchable: false
+                                },
+                                {
+                                    data: 'uploaded_at',
+                                    name: 'uploaded_at',
                                     orderable: false,
                                     searchable: false
                                 },

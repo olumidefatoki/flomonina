@@ -125,7 +125,7 @@ class DeliveryService
             $endDate   = $request['end_date'] . ' 23:59:59';
             $deliveries->whereBetween('delivery.created_at', array($startDate, $endDate));
         }
-        $deliveries->orderBy('delivery.created_at', 'desc');
+        $deliveries->orderBy('delivery.uploaded_at', 'desc');
         $deliveries->select(
             'delivery.*',
             'dispatch.truck_number',
@@ -153,7 +153,7 @@ class DeliveryService
             })->editColumn('created_at', function ($item) {
                 if (empty($item->created_at))
                     return $item->created_at;
-                return date('Y-m-d H:i:s', strtotime($item->created_at));
+                return date('Y-m-d', strtotime($item->created_at));
             })
             ->make(true);
     }
